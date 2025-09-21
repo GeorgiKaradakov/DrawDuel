@@ -1,0 +1,27 @@
+spring:
+  main:
+    banner-mode: "off"
+
+  # Exclude ALL DB auto-config so the app doesn't look for any database
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
+      - org.springframework.boot.autoconfigure.r2dbc.R2dbcDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.r2dbc.R2dbcConnectionFactoryAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO

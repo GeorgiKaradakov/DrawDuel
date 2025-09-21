@@ -1,0 +1,85 @@
+# ---------------------------
+# Global ignores
+# ---------------------------
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# OS junk
+ehthumbs.db
+desktop.ini
+
+# ---------------------------
+# Eclipse / Buildship (Java IDE)
+# ---------------------------
+*.classpath
+*.project
+*.prefs
+*.factorypath
+.settings/
+
+# ---------------------------
+# Backend (Java + Gradle + Spring Boot)
+# ---------------------------
+backend/.gradle/
+backend/build/
+backend/**/build/
+backend/bin/
+backend/**/bin/
+backend/out/
+backend/**/out/
+
+# Gradle wrapper logs
+.gradle/
+build/
+
+# Spring Boot logs
+*.log
+
+# Local environment config
+backend/src/main/resources/application-local.yml
+backend/src/main/resources/application-*.yml
+
+# ---------------------------
+# Frontend (React / Node.js)
+# ---------------------------
+frontend/node_modules/
+frontend/.next/
+frontend/.nuxt/
+frontend/dist/
+frontend/build/
+
+# npm / yarn / pnpm logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# local env files
+frontend/.env
+frontend/.env.*.local
+
+# ---------------------------
+# Common
+# ---------------------------
+.env
+.env.local
+*.env
+
+# Ignore coverage reports
+coverage/
+frontend/coverage/
+backend/coverage/
+
+# Ignore packaged archives
+*.zip
+*.tar.gz
+*.rar
+

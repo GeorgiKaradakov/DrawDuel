@@ -1,0 +1,23 @@
+plugins {
+  id "java"
+}
+
+allprojects {
+  group = "com.drawduel"
+  version = "0.1.0"
+  repositories { mavenCentral() }
+}
+
+subprojects {
+  plugins.withType(org.gradle.api.plugins.JavaPlugin) {
+    java {
+      toolchain {
+        languageVersion = JavaLanguageVersion.of(24)
+      }
+    }
+    tasks.withType(JavaCompile).configureEach {
+      options.encoding = "UTF-8"
+    }
+    test { useJUnitPlatform() }
+  }
+}

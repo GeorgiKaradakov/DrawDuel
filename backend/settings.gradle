@@ -1,0 +1,8 @@
+pluginManagement {
+  repositories {
+    gradlePluginPortal();
+    mavenCentral()
+  }
+}
+rootProject.name = "backend"
+include "domain", "application", "infrastructure"
