@@ -15,9 +15,15 @@ subprojects {
         languageVersion = JavaLanguageVersion.of(24)
       }
     }
+
     tasks.withType(JavaCompile).configureEach {
       options.encoding = "UTF-8"
     }
+
+    dependencies {
+      implementation 'org.projectlombok:lombok:1.18.30'
+    }
+
     test { useJUnitPlatform() }
   }
 }
