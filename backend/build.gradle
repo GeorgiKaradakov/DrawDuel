@@ -12,7 +12,7 @@ subprojects {
   plugins.withType(org.gradle.api.plugins.JavaPlugin) {
     java {
       toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
+        languageVersion = JavaLanguageVersion.of(25)
       }
     }
 
