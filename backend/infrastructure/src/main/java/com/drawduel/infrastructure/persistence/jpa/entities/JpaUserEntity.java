@@ -1,4 +1,4 @@
-package com.drawduel.infrastructure.persistence.entities;
+package com.drawduel.infrastructure.persistence.jpa.entities;
 
 import jakarta.persistence.*;
 import java.time.Instant;
@@ -7,7 +7,6 @@ import lombok.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class JpaUserEntity {
@@ -27,6 +26,4 @@ public class JpaUserEntity {
 
   @Column(name = "created_at", nullable = false)
   private Instant createdAt;
-
-  public JpaUserEntity() {}
 }
