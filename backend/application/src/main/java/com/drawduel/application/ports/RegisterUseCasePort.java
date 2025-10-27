@@ -3,7 +3,7 @@ package com.drawduel.application.ports;
 import com.drawduel.application.dtos.AuthResponseDto;
 import com.drawduel.application.dtos.RegisterRequestDto;
 
-public interface RegisterUserCasePort {
+public interface RegisterUseCasePort {
   public record Query(RegisterRequestDto request) {}
 
   public record Result(AuthResponseDto response) {}

@@ -57,17 +57,6 @@ public class JwtService {
     return UUID.fromString(userId);
   }
 
-  public UUID extractUserIdFromExpiredToken(String token) {
-    String userId =
-        Jwts.parserBuilder()
-            .setSigningKey(key)
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .getSubject();
-    return UUID.fromString(userId);
-  }
-
   public String extractUsername(String token) {
     return Jwts.parserBuilder()
         .setSigningKey(key)

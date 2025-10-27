@@ -8,26 +8,28 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface TokensJpaRepository extends JpaRepository<JpaTokensEntity, UUID> {
-  Optional<JpaTokensEntity> findByToken(String token);
+  Optional<JpaTokensEntity> findByRefreshToken(String token);
 
   Optional<JpaTokensEntity> findByUserId(UUID userId);
 
-  @Transactional
-  @Modifying
-  @Query("DELETE FROM JpaTokensEntity t WHERE t.userId = :userId")
-  void deleteByUserId(UUID userId);
+  // @Transactional
+  // @Modifying
+  // @Query("DELETE FROM JpaTokensEntity t WHERE t.userId = :userId")
+  // void deleteByUserId(UUID userId);
 
   @Transactional
   @Modifying
   @Query("DELETE FROM JpaTokensEntity t WHERE t.refreshToken = :token")
-  void deleteByToken(String token);
+  void deleteByRefreshToken(String token);
 
   @Transactional
   @Modifying
   @Query("DELETE FROM JpaTokensEntity t WHERE t.expiresAt < :now")
   void deleteAllExpiredTokens(Instant now);
 
-  boolean existsByToken(String token);
+  boolean existsByRefreshToken(String token);
 }

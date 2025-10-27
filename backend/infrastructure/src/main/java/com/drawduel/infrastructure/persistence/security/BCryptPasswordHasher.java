@@ -2,7 +2,9 @@ package com.drawduel.infrastructure.persistence.security;
 
 import com.drawduel.domain.ports.PasswordHasher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BCryptPasswordHasher implements PasswordHasher {
   private final BCryptPasswordEncoder encoder;
 

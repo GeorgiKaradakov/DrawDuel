@@ -14,12 +14,12 @@ import lombok.Setter;
 @Table(name = "tokens")
 public class JpaTokensEntity {
   @Id
-  @GeneratedValue
   @Column(columnDefinition = "uuid")
   private UUID Id;
 
-  @Column(nullable = false)
-  private UUID userId;
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private JpaUserEntity user;
 
   @Column(nullable = false, unique = true, length = 512)
   private String refreshToken;

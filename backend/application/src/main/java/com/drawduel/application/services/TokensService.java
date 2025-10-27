@@ -32,7 +32,7 @@ public class TokensService {
         new com.drawduel.application.ports.SaveRefreshTokenUseCasePort.Query(session));
   }
 
-  private String generateAccessToken(UUID userId, String username, String email) {
+  public String generateAccessToken(UUID userId, String username, String email) {
     return jwtService.generateToken(userId, username, email);
   }
 
