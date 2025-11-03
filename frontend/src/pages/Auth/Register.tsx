@@ -21,7 +21,7 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center space-y-24">
+    <div className="pt-8 flex flex-col justify-center items-center gap-y-16">
       <p className="pt-5 text-neutral-200 font-semibold text-4xl">
         Register to DrawDuel
       </p>
@@ -35,7 +35,7 @@ const Register = () => {
             name="username"
             label="Username:"
             placeholder="username ..."
-            className="w-3/5 text-md"
+            className="w-4/5 text-lg"
           />
 
           <FormInput
@@ -44,7 +44,7 @@ const Register = () => {
             label="Email:"
             type="email"
             placeholder="example@email.com"
-            className="w-3/5 text-md"
+            className="w-4/5 text-lg"
           />
 
           <FormInput
@@ -53,8 +53,28 @@ const Register = () => {
             label="Password:"
             type="password"
             putPasVisibilityToggle={true}
-            placeholder="example@email.com"
-            className="w-3/5 text-md"
+            placeholder="password ..."
+            className="w-4/5 text-md"
+            description="The password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol!"
+          />
+
+          <FormInput
+            formControl={form.control}
+            name="passRepeat"
+            label="Repeat Password:"
+            type="password"
+            putPasVisibilityToggle={true}
+            placeholder="repeat password:"
+            className="w-4/5 text-lg"
+            description="The password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol!"
+          />
+
+          <FormInput
+            formControl={form.control}
+            name="terms"
+            label="Agree to Terms and Conditions"
+            type="checkbox"
+            className="w-4/5"
           />
         </form>
       </Form>

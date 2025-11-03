@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Control, FieldValues, Path } from "react-hook-form";
 
 export type FormInputProps<T extends FieldValues> = {
@@ -11,4 +12,11 @@ export type FormInputProps<T extends FieldValues> = {
   putPasVisibilityToggle?: boolean;
   className?: string;
   inputClassName?: string;
+};
+
+export type FormDescriptionToolTipProps = {
+  children: ReactNode;
+  description: string;
+  className?: string;
+  textStyle?: string;
 };
