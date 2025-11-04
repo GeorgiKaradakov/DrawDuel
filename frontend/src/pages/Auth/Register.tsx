@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { Form } from "@/components/ui/form";
 import FormInput from "@/components/layout/Auth/FormInput";
+import { Button } from "@/components/ui/button";
 
 const Register = () => {
   const form = useForm<z.infer<typeof registerSchema>>({
@@ -21,61 +22,85 @@ const Register = () => {
   };
 
   return (
-    <div className="pt-8 flex flex-col justify-center items-center gap-y-16">
+    <div className="pt-8 flex flex-col justify-center items-center space-y-12">
       <p className="pt-5 text-neutral-200 font-semibold text-4xl">
         Register to DrawDuel
       </p>
       <Form {...form}>
         <form
-          className="w-full h-full flex flex-col justify-center items-center space-y-2"
+          className="w-full h-full flex flex-col justify-center items-center space-y-8"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <FormInput
-            formControl={form.control}
-            name="username"
-            label="Username:"
-            placeholder="username ..."
-            className="w-4/5 text-lg"
-          />
+          <div className="w-full flex flex-col justify-center items-center space-y-2">
+            <FormInput
+              formControl={form.control}
+              name="username"
+              label="Username:"
+              placeholder="username ..."
+              className="w-4/5 text-lg"
+            />
 
-          <FormInput
-            formControl={form.control}
-            name="email"
-            label="Email:"
-            type="email"
-            placeholder="example@email.com"
-            className="w-4/5 text-lg"
-          />
+            <FormInput
+              formControl={form.control}
+              name="email"
+              label="Email:"
+              type="email"
+              placeholder="example@email.com"
+              className="w-4/5 text-lg"
+            />
 
-          <FormInput
-            formControl={form.control}
-            name="pass"
-            label="Password:"
-            type="password"
-            putPasVisibilityToggle={true}
-            placeholder="password ..."
-            className="w-4/5 text-md"
-            description="The password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol!"
-          />
+            <FormInput
+              formControl={form.control}
+              name="pass"
+              label="Password:"
+              type="password"
+              putPasVisibilityToggle={true}
+              placeholder="password ..."
+              className="w-4/5 text-md"
+              description="The password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol!"
+            />
 
-          <FormInput
-            formControl={form.control}
-            name="passRepeat"
-            label="Repeat Password:"
-            type="password"
-            putPasVisibilityToggle={true}
-            placeholder="repeat password:"
-            className="w-4/5 text-lg"
-            description="The password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol!"
-          />
+            <FormInput
+              formControl={form.control}
+              name="passRepeat"
+              label="Confirm Password:"
+              type="password"
+              putPasVisibilityToggle={true}
+              placeholder="confirm password:"
+              className="w-4/5 text-lg"
+              description="The confirmed password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol and it needs to match your chosen password!"
+            />
 
-          <FormInput
-            formControl={form.control}
-            name="terms"
-            label="Agree to Terms and Conditions"
-            type="checkbox"
-            className="w-4/5"
-          />
+            <FormInput
+              formControl={form.control}
+              name="terms"
+              label="Agree to Terms and Conditions"
+              type="checkbox"
+              className="w-4/5"
+            />
+          </div>
+
+          <div className="pt-6 w-full flex flex-col justify-center items-center space-y-3">
+            <Button
+              variant="default"
+              className="bg-violet-500 w-3/5 text-lg"
+              type="submit"
+            >
+              Register
+            </Button>
+            <div className="w-full flex flex-col justify-center items-center">
+              <p className="text-neutral-200 text-md space-y-1">
+                Already have an account?
+              </p>
+              <Button
+                variant="secondary"
+                className="w-3/5 py-4 text-lg"
+                type="button"
+              >
+                <p className="py-10">Sign up</p>
+              </Button>
+            </div>
+          </div>
         </form>
       </Form>
     </div>

@@ -20,8 +20,8 @@ const FormDescrriptionToolTip = ({
       <Tooltip>
         <TooltipTrigger className="w-full h-full">{children}</TooltipTrigger>
         <TooltipContent
-          side="top"
-          align="center"
+          side="bottom"
+          align="start"
           className="w-xs text-center bg-neutral-800 rounded-md border border-neutral-400 p-2"
         >
           <p
