@@ -1,10 +1,14 @@
 package com.drawduel.infrastructure.config;
 
+import com.drawduel.application.ports.GetRefreshTokenUseCasePort;
+import com.drawduel.application.ports.GetUserByIdUseCasePort;
 import com.drawduel.application.ports.LoginUseCasePort;
 import com.drawduel.application.ports.RegisterUseCasePort;
 import com.drawduel.application.ports.SaveRefreshTokenUseCasePort;
 import com.drawduel.application.services.JwtService;
 import com.drawduel.application.services.TokensService;
+import com.drawduel.application.usecases.GetRefreshTokenUseCase;
+import com.drawduel.application.usecases.GetUserByIdUseCase;
 import com.drawduel.application.usecases.LoginUseCase;
 import com.drawduel.application.usecases.RegisterUseCase;
 import com.drawduel.application.usecases.SaveRefreshTokenUseCase;
@@ -30,6 +34,18 @@ public class AuthConfig {
       JwtService jwtService,
       SaveRefreshTokenUseCasePort saveRefreshTokenUseCase) {
     return new TokensService(jwtService, saveRefreshTokenUseCase, refreshTokenExpirationDays);
+  }
+
+  @Bean
+  public GetUserByIdUseCasePort getUserByIdUseCase(UserRepositoryImpl userRepo) {
+    return new GetUserByIdUseCase(userRepo);
+  }
+
+  @Bean
+  public GetRefreshTokenUseCasePort getRefreshTokenUseCase(
+      RefreshTokenRepository refreshTokenRepository,
+      com.drawduel.application.mapper.UserSessionDomainToDtoMapper mapper) {
+    return new GetRefreshTokenUseCase(refreshTokenRepository, mapper);
   }
 
   @Bean

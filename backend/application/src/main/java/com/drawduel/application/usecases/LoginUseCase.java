@@ -36,7 +36,8 @@ public class LoginUseCase implements LoginUseCasePort {
       throw new IllegalArgumentException("Invalid credentials");
     }
 
-    return new Result(
-        tokensService.generateTokens(user, q.ipAddress(), q.userAgent(), q.location()));
+    String[] tokens =
+        tokensService.generateTokens(user, q.ipAddress(), q.userAgent(), q.location());
+    return new Result(tokens[0], tokens[1]);
   }
 }

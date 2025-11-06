@@ -1,5 +1,6 @@
 package com.drawduel.infrastructure.persistence.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +30,10 @@ public class SecurityConfig {
             auth -> auth.requestMatchers("/api/auth/**").permitAll().anyRequest().authenticated())
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider())
-        .userDetailsService(userDetailsService)
+        .exceptionHandling(
+            ex ->
+                ex.authenticationEntryPoint(
+                    (req, res, e) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
         .addFilterBefore(
             jwtAuthenticationFilter,
             org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter

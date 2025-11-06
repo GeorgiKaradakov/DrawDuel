@@ -1,5 +1,6 @@
 package com.drawduel.application.services;
 
+import com.drawduel.application.dtos.UserDto;
 import com.drawduel.application.ports.SaveRefreshTokenUseCasePort;
 import com.drawduel.domain.models.User;
 import com.drawduel.domain.models.UserSession;
@@ -39,6 +40,12 @@ public class TokensService {
   }
 
   public String[] generateTokens(User user, String ipAdress, String userAgent, String location) {
+    String refreshToken = generateRefreshToken(user.getId(), ipAdress, userAgent, location);
+    String accessToken = generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
+    return new String[] {accessToken, refreshToken};
+  }
+
+  public String[] generateTokens(UserDto user, String ipAdress, String userAgent, String location) {
     String refreshToken = generateRefreshToken(user.getId(), ipAdress, userAgent, location);
     String accessToken = generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
     return new String[] {accessToken, refreshToken};

@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      var userDetails = userDetailsService.loadUserByIdentifier(email);
+      var userDetails = userDetailsService.loadUserByUsername(email);
       if (jwtService.isTokenValid(jwt)) {
         UsernamePasswordAuthenticationToken auth =
             new UsernamePasswordAuthenticationToken(
@@ -48,5 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(auth);
       }
     }
+
+    filterChain.doFilter(request, response);
   }
 }
