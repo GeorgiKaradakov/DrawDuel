@@ -48,9 +48,10 @@ public class RegisterUseCase implements RegisterUseCasePort {
     User user = new User(UUID.randomUUID(), req.getUsername(), req.getEmail(), hash, Instant.now());
     userRepo.save(user);
 
-    return new Result(
-        new AuthResponseDto(
-            tokensService.generateTokens(
-                user, req.getIpAddress(), req.getUserAgent(), req.getLocation())));
+    String[] tokens =
+        tokensService.generateTokens(
+            user, req.getIpAddress(), req.getUserAgent(), req.getLocation());
+
+    return new Result(new AuthResponseDto(tokens[0], tokens[1]));
   }
 }

@@ -5,6 +5,8 @@ import com.drawduel.application.dtos.RegisterRequestDto;
 import com.drawduel.application.ports.LoginUseCasePort;
 import com.drawduel.application.ports.RegisterUseCasePort;
 import jakarta.servlet.http.HttpServletRequest;
+import java.net.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,9 +34,20 @@ public class AuthController {
     req.setIpAddress(Ip);
     req.setUserAgent(userAgent);
     req.setLocation(location);
+    var tokens = registerUseCase.handle(new RegisterUseCasePort.Query(req));
+    // var accessToken = new AuthResponseDto("mocked_token_for_registration");
+    ResponseCookie cookie =
+        ResponseCookie.from("refreshToken", tokens.response().getRefreshToken())
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Strict")
+            .path("/")
+            .maxAge(7 * 24 * 60 * 60)
+            .build();
+    request.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-    var accessToken = registerUseCase.handle(new RegisterUseCasePort.Query(req));
-    return ResponseEntity.ok(accessToken.response());
+    return ResponseEntity.ok(tokens.response().getAccessToken());
+    // return ResponseEntity.ok(accessToken);
   }
 
   private String extractClientIp(HttpServletRequest request) {

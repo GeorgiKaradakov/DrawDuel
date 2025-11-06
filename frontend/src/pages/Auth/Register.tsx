@@ -5,8 +5,10 @@ import z from "zod";
 import { Form } from "@/components/ui/form";
 import FormInput from "@/components/layout/Auth/FormInput";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router";
 
 const Register = () => {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -99,6 +101,7 @@ const Register = () => {
                 className="w-4/5 text-2xl text-neutral-200 font-semibold bg-neutral-600 hover:bg-neutral-700 hover:cursor-pointer"
                 size="lg"
                 type="button"
+                onClick={() => navigate("/auth/login")}
               >
                 Sign up
               </Button>
