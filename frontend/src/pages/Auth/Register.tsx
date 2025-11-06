@@ -19,10 +19,11 @@ const Register = () => {
 
   const onSubmit = (values: z.infer<typeof registerSchema>) => {
     console.log(values);
+    form.reset();
   };
 
   return (
-    <div className="pt-8 flex flex-col justify-center items-center space-y-12">
+    <div className="py-8 pb-14 flex flex-col justify-center items-center space-y-12">
       <p className="pt-5 text-neutral-200 font-semibold text-4xl">
         Register to DrawDuel
       </p>
@@ -83,21 +84,23 @@ const Register = () => {
           <div className="pt-6 w-full flex flex-col justify-center items-center space-y-3">
             <Button
               variant="default"
-              className="bg-violet-500 w-3/5 text-lg"
+              className="bg-violet-500 w-4/5 text-2xl text-white font-bold hover:bg-violet-600 hover:cursor-pointer"
+              size="lg"
               type="submit"
             >
               Register
             </Button>
-            <div className="w-full flex flex-col justify-center items-center">
-              <p className="text-neutral-200 text-md space-y-1">
+            <div className="w-full flex flex-col justify-center items-center space-y-1">
+              <p className="text-neutral-200 text-lg font-semibold space-y-1">
                 Already have an account?
               </p>
               <Button
                 variant="secondary"
-                className="w-3/5 py-4 text-lg"
+                className="w-4/5 text-2xl text-neutral-200 font-semibold bg-neutral-600 hover:bg-neutral-700 hover:cursor-pointer"
+                size="lg"
                 type="button"
               >
-                <p className="py-10">Sign up</p>
+                Sign up
               </Button>
             </div>
           </div>

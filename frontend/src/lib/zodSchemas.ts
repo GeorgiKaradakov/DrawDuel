@@ -38,3 +38,25 @@ export const registerSchema = z
       });
     }
   });
+
+export const loginSchema = z.object({
+  identifier: z
+    .string()
+    .min(4, "Please enter a valid username or email!")
+    .refine((val) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(val) || val.length >= 4;
+    }, "Please enter a valid username or email!"),
+  pass: z
+    .string()
+    .min(6, "Confirmed password must be atleast 6 characters!")
+    .regex(
+      /[A-Z]/,
+      "Confirmed password must contain at least one uppercase letter!",
+    )
+    .regex(/[0-9]/, "Confirmed password must contain at least one digit!")
+    .regex(
+      /[^A-Za-z0-9]/,
+      "Confirmed password must contain at least one special symbol!",
+    ),
+});
