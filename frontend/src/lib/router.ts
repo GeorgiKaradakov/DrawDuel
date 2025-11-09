@@ -1,6 +1,7 @@
 import AuthLayout from "@/components/layout/Auth/AuthLayout";
 import Login from "@/pages/Auth/Login";
 import Register from "@/pages/Auth/Register";
+import Dashboard from "@/pages/Dashboard/Dashboard";
 import { createBrowserRouter } from "react-router";
 
 export const router = createBrowserRouter([
@@ -14,6 +15,10 @@ export const router = createBrowserRouter([
           { path: "login", Component: Login },
           { path: "register", Component: Register },
         ],
+      },
+      {
+        path: "dashboard",
+        Component: Dashboard,
       },
     ],
   },

@@ -6,6 +6,7 @@ import { Form } from "@/components/ui/form";
 import FormInput from "@/components/layout/Auth/FormInput";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
+import { register } from "./auth";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -19,9 +20,28 @@ const Register = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof registerSchema>) => {
-    console.log(values);
-    form.reset();
+  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
+    try {
+      await register(
+        values.username,
+        values.email,
+        values.pass,
+        values.passRepeat,
+      );
+
+      // ✅ user is immediately authenticated (token + cookie)
+      navigate("/dashboard");
+    } catch (err: any) {
+      if (typeof err === "object" && !("message" in err)) {
+        Object.entries(err).forEach(([field, message]) => {
+          form.setError(field as keyof typeof values, {
+            message: message as string,
+          });
+        });
+      } else {
+        form.setError("root", { message: err.message });
+      }
+    }
   };
 
   return (
@@ -70,7 +90,7 @@ const Register = () => {
               type="password"
               putPasVisibilityToggle={true}
               placeholder="confirm password:"
-              className="w-4/5 text-lg"
+              className="w-4/5 text-md"
               description="The confirmed password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol and it needs to match your chosen password!"
             />
 

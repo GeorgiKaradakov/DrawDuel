@@ -6,6 +6,7 @@ import { Form } from "@/components/ui/form";
 import FormInput from "@/components/layout/Auth/FormInput";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
+import { login } from "./auth";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,9 +18,24 @@ const Login = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof loginSchema>) => {
-    console.log(values);
-    form.reset();
+  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    try {
+      await login(values.identifier, values.pass);
+
+      // ✅ user is now authenticated (access token set)
+      navigate("/dashboard");
+    } catch (err: any) {
+      // If backend gives field errors
+      if (typeof err === "object" && !("message" in err)) {
+        Object.entries(err).forEach(([field, message]) => {
+          form.setError(field as keyof typeof values, {
+            message: message as string,
+          });
+        });
+      } else {
+        form.setError("root", { message: err.message });
+      }
+    }
   };
 
   return (

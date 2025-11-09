@@ -50,8 +50,8 @@ public class AuthController {
     req.setIpAddress(Ip);
     req.setUserAgent(userAgent);
     req.setLocation(location);
+
     var tokens = registerUseCase.handle(new RegisterUseCasePort.Query(req));
-    // var accessToken = new AuthResponseDto("mocked_token_for_registration");
     ResponseCookie cookie =
         ResponseCookie.from("refreshToken", tokens.response().getRefreshToken())
             .httpOnly(true)
@@ -63,7 +63,6 @@ public class AuthController {
     res.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString());
 
     return ResponseEntity.ok(new AccessTokenDto(tokens.response().getAccessToken()));
-    // return ResponseEntity.ok(accessToken);
   }
 
   @PostMapping("/login")
@@ -104,7 +103,6 @@ public class AuthController {
       session =
           getRefreshTokenUseCase.handle(new GetRefreshTokenUseCase.Query(refreshToken)).response();
     } catch (Exception e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

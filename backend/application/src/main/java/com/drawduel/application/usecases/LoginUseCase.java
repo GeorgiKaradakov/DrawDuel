@@ -31,7 +31,7 @@ public class LoginUseCase implements LoginUseCasePort {
 
     User user = optUser.get();
 
-    Boolean passMatch = hasher.matches(q.rawPass(), user.getPassHash());
+    Boolean passMatch = hasher.matches(q.password(), user.getPassHash());
     if (!passMatch) {
       throw new IllegalArgumentException("Invalid credentials");
     }

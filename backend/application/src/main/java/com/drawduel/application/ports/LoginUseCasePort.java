@@ -2,7 +2,7 @@ package com.drawduel.application.ports;
 
 public interface LoginUseCasePort {
   public record Query(
-      String identifier, String rawPass, String ipAddress, String userAgent, String location) {}
+      String identifier, String password, String ipAddress, String userAgent, String location) {}
 
   public record Result(String accessToken, String refreshToken) {}
 
