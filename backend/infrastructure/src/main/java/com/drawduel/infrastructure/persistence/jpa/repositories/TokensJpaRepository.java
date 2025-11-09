@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TokensJpaRepository extends JpaRepository<JpaTokensEntity, UUID> {
+  @Transactional
   Optional<JpaTokensEntity> findByRefreshToken(String token);
 
   Optional<JpaTokensEntity> findByUserId(UUID userId);

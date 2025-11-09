@@ -10,5 +10,7 @@ public interface RefreshTokenRepository {
 
   Optional<UserSession> findByRefreshToken(String refreshToken);
 
+  void revokeRefreshToken(String refreshToken);
+
   void deleteByUserId(UUID userId);
 }

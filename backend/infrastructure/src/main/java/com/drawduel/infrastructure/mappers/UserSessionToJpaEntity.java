@@ -8,12 +8,12 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserSessionToJpaEntity {
   // Domain to Jpa Entity
-  @Mapping(target = "userId", source = "user.id")
-  @Mapping(target = "ipAddress", source = "ipAdress")
+  @Mapping(target = "user", ignore = true)
+  @Mapping(target = "ipAdress", source = "ipAddress")
   JpaTokensEntity toJpaEntity(UserSession userSession);
 
   // Jpa Entity to Domain
-  @Mapping(target = "user", ignore = true)
-  @Mapping(target = "ipAdress", source = "ipAddress")
+  @Mapping(target = "userId", source = "user.id")
+  @Mapping(target = "ipAddress", source = "ipAdress")
   UserSession toDomain(JpaTokensEntity jpaTokensEntity);
 }

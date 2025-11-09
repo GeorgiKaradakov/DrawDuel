@@ -2,6 +2,7 @@ package com.drawduel.infrastructure.persistence.ports;
 
 import com.drawduel.domain.models.UserSession;
 import com.drawduel.domain.ports.RefreshTokenRepository;
+import com.drawduel.infrastructure.mappers.UserSessionToJpaEntity;
 import com.drawduel.infrastructure.persistence.jpa.entities.JpaTokensEntity;
 import com.drawduel.infrastructure.persistence.jpa.entities.JpaUserEntity;
 import com.drawduel.infrastructure.persistence.jpa.repositories.TokensJpaRepository;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
   private final TokensJpaRepository tokensJpaRepository;
   private final UserJpaRepository userJpaRepository;
+  private final UserSessionToJpaEntity mapper;
 
   @Override
   @Transactional
@@ -46,8 +48,19 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
 
   @Override
   public Optional<UserSession> findByRefreshToken(String refreshToken) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'findByRefreshToken'");
+    return tokensJpaRepository.findByRefreshToken(refreshToken).map(mapper::toDomain);
+  }
+
+  @Override
+  @Transactional
+  public void revokeRefreshToken(String refreshToken) {
+    tokensJpaRepository
+        .findByRefreshToken(refreshToken)
+        .ifPresent(
+            token -> {
+              token.setRevoked(true);
+              tokensJpaRepository.save(token);
+            });
   }
 
   @Override

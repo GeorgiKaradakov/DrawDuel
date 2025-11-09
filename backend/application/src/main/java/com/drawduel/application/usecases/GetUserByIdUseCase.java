@@ -18,6 +18,6 @@ public class GetUserByIdUseCase implements GetUserByIdUseCasePort {
     User user =
         userRepo.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-    return new Result(mapper.toDto(user));
+    return new Result(mapper.toUserDto(user));
   }
 }

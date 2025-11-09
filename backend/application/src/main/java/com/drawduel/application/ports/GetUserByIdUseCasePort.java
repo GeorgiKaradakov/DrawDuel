@@ -6,7 +6,7 @@ import java.util.UUID;
 public interface GetUserByIdUseCasePort {
   public record Query(UUID userID) {}
 
-  public record Result(UserDto userDto) {}
+  public record Result(UserDto response) {}
 
   Result handle(Query q);
 }
