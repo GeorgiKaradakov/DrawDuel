@@ -15,25 +15,12 @@ const refreshClient = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-let isRefreshing = false;
-let refreshTokens: ((token: string) => void)[] = [];
-
-function TokenRefresh(ch: (toekn: string) => void) {
-  refreshTokens.push(ch);
-}
-
-function onRefreshed(token: string) {
-  refreshTokens.forEach((ch) => ch(token));
-  refreshTokens = [];
-}
-
 api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
-      console.log("Attached token");
-    } else console.log("⚠️ No token found");
+    }
     return config;
   },
   (error) => Promise.reject(error),
@@ -44,38 +31,24 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise((resolve) => {
-          TokenRefresh((token) => {
-            originalRequest.headers = {
-              ...originalRequest.headers,
-              Authorization: `Bearer ${token}`,
-            };
-            resolve(api(originalRequest));
-          });
-        });
-      }
-
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
-      isRefreshing = true;
 
       try {
         const res = await refreshClient.post("/api/auth/refresh-tokens");
-        const newToken = res.data.access_token;
-        setAccessToken(newToken);
-        onRefreshed(newToken);
-        originalRequest.headers = {
-          ...originalRequest.headers,
-          Authorization: `Bearer ${newToken}`,
-        };
-        console.log("🔄 Retrying request with new token:", newToken);
+        const { accessToken } = res.data;
+
+        setAccessToken(accessToken);
+
+        originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
         return api(originalRequest);
-      } catch (err) {
-        isRefreshing = false;
-        console.error("Token refresh failed", err);
+      } catch (error: any) {
         window.location.href = "/auth/login";
-        return Promise.reject(err);
+        return Promise.reject(error);
       }
     }
 

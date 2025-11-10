@@ -9,7 +9,6 @@ export const login = async (identifier: string, pass: string) => {
     });
 
     const { accessToken } = response.data;
-    console.log(accessToken);
     setAccessToken(accessToken);
     return accessToken;
   } catch (error: any) {
@@ -32,6 +31,8 @@ export const register = async (
       repeatPass: passRepeat,
     });
 
+    console.log(response.data);
+
     const { accessToken } = response.data;
     setAccessToken(accessToken);
     return accessToken;
@@ -41,7 +42,7 @@ export const register = async (
     }
 
     const message =
-      error.response?.data?.message || "Registration failed. Please try again.";
+      error.response?.data || "Registration failed. Please try again.";
     throw new Error(message);
   }
 };

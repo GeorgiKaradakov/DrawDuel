@@ -32,14 +32,14 @@ const Register = () => {
       // ✅ user is immediately authenticated (token + cookie)
       navigate("/dashboard");
     } catch (err: any) {
-      if (typeof err === "object" && !("message" in err)) {
-        Object.entries(err).forEach(([field, message]) => {
-          form.setError(field as keyof typeof values, {
-            message: message as string,
-          });
-        });
+      const message: string = err.message;
+
+      if (message.includes("Username")) {
+        form.setError("username", { message });
+      } else if (message.includes("Email")) {
+        form.setError("email", { message });
       } else {
-        form.setError("root", { message: err.message });
+        form.setError("root", { message });
       }
     }
   };

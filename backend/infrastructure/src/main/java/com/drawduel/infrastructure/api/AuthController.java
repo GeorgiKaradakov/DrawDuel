@@ -103,7 +103,6 @@ public class AuthController {
       session =
           getRefreshTokenUseCase.handle(new GetRefreshTokenUseCase.Query(refreshToken)).response();
     } catch (Exception e) {
-      e.printStackTrace();
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     if (session.getRevoked() || session.getExpiresAt().isBefore(Instant.now()))
@@ -114,7 +113,6 @@ public class AuthController {
       user =
           getUserByIdUseCase.handle(new GetUserByIdUseCase.Query(session.getUserId())).response();
     } catch (Exception e) {
-      e.printStackTrace();
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
