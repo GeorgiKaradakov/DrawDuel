@@ -1,5 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
+
+
+:root {
+  --font-headers: 'Inter', sans-serif;
+  --font-hero: 'Orbitron', sans-serif;
+}
 
 @custom-variant dark (&:is(.dark *));
 

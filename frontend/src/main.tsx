@@ -1,10 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
 import "./styles/tailwind.css";
+import { RouterProvider } from "react-router";
+import { router } from "./lib/router.ts";
+import { TooltipProvider } from "./components/ui/tooltip.tsx";
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  <RouterProvider router={router} />,
 );
