@@ -3,6 +3,7 @@ package com.drawduel.infrastructure.persistence.jpa.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.*;
@@ -30,5 +31,5 @@ public class JpaUserEntity {
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonIgnore
-  private List<JpaTokensEntity> tokens;
+  private List<JpaTokensEntity> tokens = new ArrayList<>();
 }

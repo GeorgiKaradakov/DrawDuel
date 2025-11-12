@@ -12,6 +12,5 @@ public interface UserDomainToDtoMapper {
   User toDomain(UserDto userDto);
 
   // Domain to Dto
-  @Mapping(target = "createdAt", source = "createdAt")
   UserDto toUserDto(User user);
 }
