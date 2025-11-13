@@ -11,7 +11,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class UserRepositoryIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private UserJpaRepository userJpaRepository;
@@ -20,6 +22,8 @@ public class UserRepositoryIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
   void setup() {
+    System.out.println("🔗 Connected DB: " + POSTGRES.getJdbcUrl());
+
     userRepository = new UserRepositoryImpl(userJpaRepository);
   }
 

@@ -17,8 +17,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private TokensJpaRepository tokensJpaRepository;
@@ -29,6 +31,8 @@ public class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest 
 
   @BeforeEach
   void setup() {
+    System.out.println("🔗 Connected DB: " + POSTGRES.getJdbcUrl());
+
     assertThat(tokensJpaRepository).as("tokensJpaRepository is autowired").isNotNull();
     assertThat(userJpaRepository).as("userJpaRepository is autowired").isNotNull();
 
