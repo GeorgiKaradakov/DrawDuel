@@ -12,13 +12,15 @@ variables:
 cache:
   key: gradle-cache
   paths:
-    - .gradle/wrapper
-    - .gradle/caches
+    - backend/.gradle/wrapper
+    - backend/.gradle/caches
 
 # ⚡ FAST TESTS — logic, services, and small components
 unit_tests:
   stage: test_fast
   image: gradle:8.10-jdk21
+  before_script:
+    - cd backend
   script:
     - echo "⚡ Running fast unit and service tests..."
     - gradle :tests:test --tests "*ServiceTest" --tests "*UseCaseTest" --rerun-tasks
@@ -27,7 +29,7 @@ unit_tests:
   artifacts:
     when: always
     reports:
-      junit: build/test-results/test/
+      junit: backend/build/test-results/test/
   only:
     - dev
     - main
@@ -42,6 +44,7 @@ integration_tests:
   variables:
     DOCKER_TLS_CERTDIR: "/certs"
   before_script:
+    - cd backend
     - echo "🐘 Running integration + controller tests with Testcontainers..."
   script:
     - gradle :tests:test --tests "*IntegrationTest" --tests "*ControllerTest" --rerun-tasks
@@ -50,7 +53,7 @@ integration_tests:
   artifacts:
     when: always
     reports:
-      junit: build/test-results/test/
+      junit: backend/build/test-results/test/
   needs:
     - job: unit_tests
       artifacts: false
@@ -63,6 +66,8 @@ integration_tests:
 build_backend:
   stage: build
   image: gradle:8.10-jdk21
+  before_script:
+    - cd backend
   script:
     - echo "🏗️ Building backend after successful tests..."
     - gradle clean build -x test
@@ -70,7 +75,7 @@ build_backend:
     - build
   artifacts:
     paths:
-      - build/libs/
+      - backend/build/libs/
     expire_in: 1 week
   needs:
     - job: integration_tests
@@ -79,4 +84,3 @@ build_backend:
     - dev
     - main
     - merge_requests
-
