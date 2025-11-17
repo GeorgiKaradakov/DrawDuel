@@ -1,4 +1,4 @@
-package com.drawduel.tests.infrastructure.repos.repos;
+package com.drawduel.tests.infrastructure.repos;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

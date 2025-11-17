@@ -1,0 +1,76 @@
+stages:
+  - test_fast
+  - test_integration
+  - build
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx2048m"
+  SPRING_PROFILES_ACTIVE: "test"
+  TESTCONTAINERS_RYUK_DISABLED: "true"
+  DOCKER_DRIVER: overlay2
+
+cache:
+  key: gradle-cache
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+# ⚡ FAST TESTS — logic, services, and small components
+unit_tests:
+  stage: test_fast
+  image: gradle:8.10-jdk21
+  script:
+    - echo "⚡ Running fast unit and service tests..."
+    - gradle :tests:test --tests "*ServiceTest" --tests "*UseCaseTest" --rerun-tasks
+  artifacts:
+    when: always
+    reports:
+      junit: build/test-results/test/
+  only:
+    - dev
+    - main
+    - merge_requests
+
+# 🧩 SLOW TESTS — database, controllers, API endpoints
+integration_tests:
+  stage: test_integration
+  image: gradle:8.10-jdk21
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - echo "🐘 Running integration + controller tests with Testcontainers..."
+  script:
+    - gradle :tests:test --tests "*IntegrationTest" --tests "*ControllerTest" --rerun-tasks
+  artifacts:
+    when: always
+    reports:
+      junit: build/test-results/test/
+  needs:
+    - job: unit_tests
+      artifacts: false
+  only:
+    - dev
+    - main
+    - merge_requests
+
+# 🏗️ BUILD — only if all tests passed
+build_backend:
+  stage: build
+  image: gradle:8.10-jdk21
+  script:
+    - echo "🏗️ Building backend after successful tests..."
+    - gradle clean build -x test
+  artifacts:
+    paths:
+      - build/libs/
+    expire_in: 1 week
+  needs:
+    - job: integration_tests
+      artifacts: false
+  only:
+    - dev
+    - main
+    - merge_requests
+

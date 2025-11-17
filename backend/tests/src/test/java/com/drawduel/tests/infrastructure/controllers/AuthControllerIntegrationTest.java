@@ -1,4 +1,4 @@
-package com.drawduel.tests.infrastructure.repos.controllers;
+package com.drawduel.tests.infrastructure.controllers;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
