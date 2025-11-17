@@ -22,6 +22,8 @@ unit_tests:
   script:
     - echo "⚡ Running fast unit and service tests..."
     - gradle :tests:test --tests "*ServiceTest" --tests "*UseCaseTest" --rerun-tasks
+  tags:
+    - tests
   artifacts:
     when: always
     reports:
@@ -43,6 +45,8 @@ integration_tests:
     - echo "🐘 Running integration + controller tests with Testcontainers..."
   script:
     - gradle :tests:test --tests "*IntegrationTest" --tests "*ControllerTest" --rerun-tasks
+  tags:
+    - tests
   artifacts:
     when: always
     reports:
@@ -62,6 +66,8 @@ build_backend:
   script:
     - echo "🏗️ Building backend after successful tests..."
     - gradle clean build -x test
+  tags:
+    - build
   artifacts:
     paths:
       - build/libs/
