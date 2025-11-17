@@ -9,26 +9,27 @@ version = '1.0.0'
 description = 'Integration and unit tests for DrawDuel backend'
 
 java {
-toolchain {
-  languageVersion = JavaLanguageVersion.of(21)
-}
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
 }
 
 repositories {
-mavenCentral()
+  mavenCentral()
 }
 
 bootJar { enabled = false }
 jar { enabled = true }
 
 dependencies {
-implementation project(':domain')
+  implementation project(':domain')
   implementation project(':application')
   implementation project(':infrastructure')
 
   // --- Spring Boot testing ---
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  testImplementation 'org.springframework.boot:spring-boot-starter-web'
 
   // --- JUnit 5 (compatible versions for older Gradle) ---
   testImplementation platform("org.junit:junit-bom:5.9.3")
