@@ -38,15 +38,19 @@ unit_tests:
 # 🧩 SLOW TESTS — database, controllers, API endpoints
 integration_tests:
   stage: test_integration
-  image: gradle:8.10-jdk21
+  image: docker:27.2.0-dind   # Use the Docker daemon image with tools
   services:
-    - docker:dind
+    - name: docker:dind
+      command: ["--tls=false", "--host=tcp://0.0.0.0:2375"]
   variables:
-    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+    TESTCONTAINERS_RYUK_DISABLED: "true"
   before_script:
+    - apk add openjdk21 bash gradle
     - cd backend
-    - echo "🐘 Running integration + controller tests with Testcontainers..."
   script:
+    - echo "🐋 Running integration + controller tests with Testcontainers..."
     - gradle :tests:test --tests "*IntegrationTest" --tests "*ControllerTest" --rerun-tasks
   tags:
     - tests
