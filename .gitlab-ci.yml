@@ -36,8 +36,10 @@ unit_tests:
 integration_tests:
   stage: test_integration
   before_script:
-    - cd backend
-    - docker info  # optional sanity check
+    - cd backend/tests
+    # Load .env variables into the environment
+    - export $(grep -v '^#' .env | xargs)
+    - cd ..
   script:
     - echo "🐘 Running integration + controller tests with Testcontainers..."
     - gradle :tests:test --tests "*IntegrationTest" --tests "*ControllerTest" --rerun-tasks
