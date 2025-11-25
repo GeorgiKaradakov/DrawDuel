@@ -105,6 +105,7 @@ public class AuthController {
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
     if (session.getRevoked() || session.getExpiresAt().isBefore(Instant.now()))
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 

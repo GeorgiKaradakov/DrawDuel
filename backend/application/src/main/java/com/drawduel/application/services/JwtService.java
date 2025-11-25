@@ -1,5 +1,7 @@
 package com.drawduel.application.services;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.security.Key;
@@ -73,5 +75,28 @@ public class JwtService {
         .parseClaimsJws(token)
         .getBody()
         .get("email", String.class);
+  }
+
+  public UUID extractUserIdAllowExpired(String token) {
+    Claims claims = extractAllClaimsAllowExpired(token);
+    return UUID.fromString(claims.getSubject());
+  }
+
+  public String extractUsernameAllowExpired(String token) {
+    Claims claims = extractAllClaimsAllowExpired(token);
+    return claims.get("username", String.class);
+  }
+
+  public String extractEmailAllowExpired(String token) {
+    Claims claims = extractAllClaimsAllowExpired(token);
+    return claims.get("email", String.class);
+  }
+
+  private Claims extractAllClaimsAllowExpired(String token) {
+    try {
+      return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    } catch (ExpiredJwtException e) {
+      return e.getClaims();
+    }
   }
 }

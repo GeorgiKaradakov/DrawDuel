@@ -38,3 +38,11 @@ dependencies {
 
   testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
+
+bootRun {
+  if (project.hasProperty('debug')) {
+    jvmArgs = [
+        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005"
+    ]
+  }
+}

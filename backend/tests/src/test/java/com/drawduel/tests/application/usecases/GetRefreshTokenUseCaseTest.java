@@ -42,7 +42,18 @@ public class GetRefreshTokenUseCaseTest {
             Instant.now(),
             Instant.now().plusSeconds(3600));
     when(tokenRepo.findByRefreshToken("refreshtoken123")).thenReturn(Optional.of(session));
-    when(mapper.toDto(session)).thenReturn(new UserSessionDto());
+    when(mapper.toDto(session))
+        .thenReturn(
+            new UserSessionDto(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                "127.0.0.1",
+                "Mozzila/5.0",
+                "Earth",
+                "refreshtoken123",
+                false,
+                Instant.now(),
+                Instant.now().plusSeconds(3600)));
 
     var result =
         getRefreshTokenUseCase.handle(new GetRefreshTokenUseCasePort.Query("refreshtoken123"));

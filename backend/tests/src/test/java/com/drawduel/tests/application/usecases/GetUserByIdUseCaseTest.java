@@ -31,7 +31,10 @@ class GetUserByIdUseCaseTest {
     UUID id = UUID.randomUUID();
     User user = new User(id, "guts", "guts@drawduel.com", "hash", Instant.now());
     when(userRepo.findById(id)).thenReturn(Optional.of(user));
-    when(mapper.toUserDto(user)).thenReturn(new com.drawduel.application.dtos.UserDto());
+    when(mapper.toUserDto(user))
+        .thenReturn(
+            new com.drawduel.application.dtos.UserDto(
+                id, "guts", "guts@drawduel.com", Instant.now()));
 
     var result = useCase.handle(new GetUserByIdUseCase.Query(id));
 

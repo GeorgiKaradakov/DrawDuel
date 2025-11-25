@@ -100,13 +100,17 @@ class AuthControllerTest extends BaseIntegrationTest {
 
   @Test
   void shouldRefreshTokensSuccessfully() throws Exception {
-    var session = new UserSessionDto();
-    session.setUserId(UUID.randomUUID());
-    session.setRevoked(false);
-    session.setExpiresAt(Instant.now().plusSeconds(3600));
-    session.setIpAddress("127.0.0.1");
-    session.setUserAgent("JUnit");
-    session.setLocation("unknown");
+    UserSessionDto session =
+        new UserSessionDto(
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            "127.0.0.1",
+            "JUnit",
+            "unknown",
+            "refreshToken123",
+            false,
+            Instant.now(),
+            Instant.now().plusSeconds(3600));
 
     var user = new UserDto(session.getUserId(), "testuser", "test@example.com", Instant.now());
 
