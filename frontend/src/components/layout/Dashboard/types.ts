@@ -7,6 +7,7 @@ export type DashboardCardType = {
   tableColumns?: Column<any>[];
   tableHeight?: string;
   chartData?: { day: string; games: number }[];
+  percantege?: boolean;
 };
 
 export interface Column<T> {

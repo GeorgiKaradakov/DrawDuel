@@ -20,6 +20,7 @@ const DashboardCard = ({
   tableColumns,
   tableHeight,
   chartData,
+  percantege,
 }: DashboardCardType) => {
   switch (type) {
     case "number":
@@ -31,7 +32,10 @@ const DashboardCard = ({
           )}
         >
           <h1 className="font-bold text-2xl">{title}</h1>
-          <p className="font-semibold text-6xl text-center">{number}</p>
+          <p className="font-semibold text-6xl text-center">
+            {number}
+            {percantege && <span className="text-4xl">%</span>}
+          </p>
         </div>
       );
 

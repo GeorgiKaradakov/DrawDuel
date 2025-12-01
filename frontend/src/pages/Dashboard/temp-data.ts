@@ -24,18 +24,24 @@ export const Matches = [
 ];
 
 export const leaderboardData = [
-  { rank: 1, username: "PlayerOne", score: 1300 },
-  { rank: 2, username: "SketchMaster", score: 1250 },
-  { rank: 3, username: "DrawKing", score: 1200 },
-  { rank: 4, username: "Random1", score: 1100 },
-  { rank: 5, username: "Random2", score: 1000 },
-  { rank: 6, username: "Random3", score: 900 },
+  { rank: 1, username: "PlayerOne", score: 1300, wins: 60 },
+  { rank: 2, username: "SketchMaster", score: 1250, wins: 59 },
+  { rank: 3, username: "DrawKing", score: 1200, wins: 58 },
+  { rank: 4, username: "Random1", score: 1100, wins: 57 },
+  { rank: 5, username: "Random2", score: 1000, wins: 56 },
+  { rank: 6, username: "Random3", score: 900, wins: 55 },
+  { rank: 7, username: "Random4", score: 900, wins: 54 },
+  { rank: 8, username: "Random5", score: 900, wins: 53 },
+  { rank: 9, username: "Random6", score: 900, wins: 52 },
+  { rank: 10, username: "Random7", score: 900, wins: 51 },
+  { rank: 9, username: "Random8", score: 900, wins: 50 },
 ];
 
 export const leaderboardColumns = [
   { key: "rank", label: "Rank" },
   { key: "username", label: "Username" },
   { key: "score", label: "Score" },
+  { key: "wins", label: "Wins" },
 ];
 
 export const chartData = [
