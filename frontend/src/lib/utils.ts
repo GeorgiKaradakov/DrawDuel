@@ -1,6 +1,20 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { Eraser, PenLine } from "lucide-react";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
+
+export const colors = {
+  black: "#000000",
+  red: "#ef4444",
+  yellow: "#facc15",
+  blue: "#3b82f6",
+  white: "#ffffff",
+};
+
+export const tools = {
+  pen: { name: "pen", icon: PenLine, strokeWidth: 5 },
+  eraser: { name: "eraser", icon: Eraser, strokeWidth: 40 },
+};
