@@ -1,15 +1,8 @@
 import { cn, tools } from "@/lib/utils";
-import DrawLogic from "@/pages/Game/Drawing";
 import { useState } from "react";
-import { object } from "zod";
+import type { ToolPickerProps } from "./types";
 
-const ToolPicker = ({
-  className,
-  onToolSelect,
-}: {
-  className: string;
-  onToolSelect: (tool: { name: string; strokeWidth: number }) => void;
-}) => {
+const ToolPicker = ({ className, onToolSelect }: ToolPickerProps) => {
   const [lastSelected, setLastSelected] = useState<number>(0);
   return (
     <div

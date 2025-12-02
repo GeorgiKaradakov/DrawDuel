@@ -20,7 +20,7 @@ export default function DrawLogic() {
   const handleMouseDown = (e: any) => {
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
-    setLines([...lines, { tool, points: [pos.x, pos.y] }]);
+    setLines([...lines, { tool, color, points: [pos.x, pos.y] }]);
   };
 
   const handleMouseMove = (e: any) => {

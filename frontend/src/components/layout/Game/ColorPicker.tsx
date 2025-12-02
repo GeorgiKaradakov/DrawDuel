@@ -1,13 +1,9 @@
 import { cn, colors } from "@/lib/utils";
-import DrawLogic from "@/pages/Game/Drawing";
+import type { ColorPickerProps } from "./types";
+import { useState } from "react";
 
-const ColorPicker = ({
-  className,
-  onColorSelect,
-}: {
-  className: string;
-  onColorSelect: (color: string) => void;
-}) => {
+const ColorPicker = ({ className, OnColorSelect }: ColorPickerProps) => {
+  const [currColor, setCurrColor] = useState<string>("#ffffff");
   return (
     <div
       className={cn(
@@ -15,11 +11,12 @@ const ColorPicker = ({
         className,
       )}
     >
-      {Object.entries(colors).map(([hex]) => (
+      {Object.entries(colors).map(([name, hex]) => (
         <div
-          className="w-10 h-10 rounded-xl hover:cursor-pointer hover:scale-105 duration-200 ease-in-out"
+          className={`w-10 h-10 rounded-xl hover:cursor-pointer hover:scale-105 duration-200 ease-in-out ${currColor === hex ? "border-3 border-amber-500" : ""}`}
           onClick={() => {
-            onColorSelect(hex);
+            OnColorSelect(hex);
+            setCurrColor(hex);
           }}
           style={{ backgroundColor: hex }}
           key={hex}

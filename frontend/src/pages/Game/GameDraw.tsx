@@ -32,7 +32,7 @@ const GameDraw = () => {
               <Line
                 key={idx}
                 points={line.points}
-                stroke={color}
+                stroke={line.color}
                 strokeWidth={line.tool.strokeWidth}
                 tension={0.5}
                 lineCap="round"
@@ -47,10 +47,11 @@ const GameDraw = () => {
           })}
         </Layer>
       </Stage>
+
       <div className="absolute w-15 h-3/8 left-2 top-1/2 flex flex-col items-center justify-between -translate-y-1/2 rounded-lg space-y-2">
         <ColorPicker
           className="w-full h-2/3"
-          onColorSelect={handleColorChange}
+          OnColorSelect={handleColorChange}
         />
         <ToolPicker className="w-full h-1/3" onToolSelect={handleToolChange} />
       </div>
