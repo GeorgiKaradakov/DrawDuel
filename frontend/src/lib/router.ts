@@ -2,6 +2,7 @@ import AuthLayout from "@/components/layout/Auth/AuthLayout";
 import Login from "@/pages/Auth/Login";
 import Register from "@/pages/Auth/Register";
 import Dashboard from "@/pages/Dashboard/Dashboard";
+import FindGame from "@/pages/FindGame/FindGame";
 import GameDraw from "@/pages/Game/GameDraw";
 import { createBrowserRouter } from "react-router";
 
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
       {
         path: "game/someGameIdWhichWillBeProvidedLater",
         children: [{ path: "draw", Component: GameDraw }],
+      },
+      {
+        path: "find-game/someUserIdWhichWillBeProvidedLater",
+        Component: FindGame,
       },
     ],
   },

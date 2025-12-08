@@ -12,7 +12,6 @@ const GameDraw = () => {
     handleColorChange,
     handleToolChange,
     lines,
-    color,
   } = DrawLogic();
 
   return (

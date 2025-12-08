@@ -1,4 +1,6 @@
-import { useRef, useState } from "react";
+import { sendDrawEvent } from "@/lib/webscoket/gameSocket";
+import { getSocket } from "@/lib/webscoket/socketManager";
+import { useEffect, useRef, useState } from "react";
 
 export default function DrawLogic() {
   const [tool, setTool] = useState<{ name: string; strokeWidth: number }>({
@@ -8,6 +10,16 @@ export default function DrawLogic() {
   const [lines, setLines] = useState<any[]>([]);
   const [color, setColor] = useState<string>("#ffffff");
   const isDrawing = useRef(false);
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+    console.log(lines);
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.tool && data.points) setLines((prev) => [...prev, data]);
+    };
+  }, []);
 
   const handleToolChange = (newTool: { name: string; strokeWidth: number }) => {
     setTool(newTool);
@@ -34,6 +46,11 @@ export default function DrawLogic() {
 
     lines.splice(lines.length - 1, 1, lastLine);
     setLines(lines.concat());
+    sendDrawEvent({
+      tool: lastLine.tool,
+      color: lastLine.color,
+      points: lastLine.points,
+    });
   };
 
   const handleMouseUp = () => {
