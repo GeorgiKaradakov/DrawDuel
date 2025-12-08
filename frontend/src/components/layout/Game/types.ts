@@ -7,3 +7,7 @@ export interface ColorPickerProps {
   className?: string;
   OnColorSelect: (color: string) => void;
 }
+
+export interface TimerProps {
+  className?: string;
+}

@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
 import { Layer, Line, Stage } from "react-konva";
 import DrawLogic from "./Drawing";
 import ColorPicker from "@/components/layout/Game/ColorPicker";
 import ToolPicker from "@/components/layout/Game/ToolPicker";
+import Timer from "@/components/layout/Game/Timer";
 
 const GameDraw = () => {
   const {
@@ -55,6 +55,7 @@ const GameDraw = () => {
         />
         <ToolPicker className="w-full h-1/3" onToolSelect={handleToolChange} />
       </div>
+      <Timer className="" />
     </>
   );
 };

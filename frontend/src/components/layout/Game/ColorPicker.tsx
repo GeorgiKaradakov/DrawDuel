@@ -13,7 +13,7 @@ const ColorPicker = ({ className, OnColorSelect }: ColorPickerProps) => {
     >
       {Object.entries(colors).map(([name, hex]) => (
         <div
-          className={`w-10 h-10 rounded-xl hover:cursor-pointer hover:scale-105 duration-200 ease-in-out ${currColor === hex ? "border-3 border-amber-500" : ""}`}
+          className={`w-10 h-10 rounded-xl hover:cursor-pointer hover:scale-105 duration-200 ease-in-out ${currColor === hex ? "border-3 border-amber-500" : "border-none"}`}
           onClick={() => {
             OnColorSelect(hex);
             setCurrColor(hex);
