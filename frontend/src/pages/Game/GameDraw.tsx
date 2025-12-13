@@ -2,7 +2,8 @@ import { Layer, Line, Stage } from "react-konva";
 import DrawLogic from "./Drawing";
 import ColorPicker from "@/components/layout/Game/ColorPicker";
 import ToolPicker from "@/components/layout/Game/ToolPicker";
-import Timer from "@/components/layout/Game/Timer";
+import Timer from "@/components/layout/Game/GameTimer";
+import WordPicker from "@/pages/Game/WordPicker";
 
 const GameDraw = () => {
   const {
@@ -16,6 +17,7 @@ const GameDraw = () => {
 
   return (
     <>
+      <WordPicker />
       <Stage
         width={window.innerWidth}
         height={window.innerHeight}

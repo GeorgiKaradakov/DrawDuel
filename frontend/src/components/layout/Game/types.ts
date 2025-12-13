@@ -10,4 +10,11 @@ export interface ColorPickerProps {
 
 export interface TimerProps {
   className?: string;
+  countDownSeconds: number;
+  onTimeUp?: () => void;
+}
+
+export interface WordContainerProps {
+  className?: string;
+  word: string;
 }
