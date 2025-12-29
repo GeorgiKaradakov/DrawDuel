@@ -10,3 +10,13 @@ export type ServerMessage =
   | { type: "disconnect"; message: string }
   | { type: "error"; message: string }
   | DrawEvent;
+
+export interface GameDrawingCanvasProps {
+  isDrawer: boolean;
+  className?: string;
+}
+
+export interface GuessMessageContProps {
+  className?: string;
+  guessMessages: string[];
+}

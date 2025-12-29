@@ -2,7 +2,7 @@ import { sendDrawEvent } from "@/lib/webscoket/gameSocket";
 import { getSocket } from "@/lib/webscoket/socketManager";
 import { useEffect, useRef, useState } from "react";
 
-export default function DrawLogic() {
+export default function DrawLogic(isDrawer: boolean) {
   const [tool, setTool] = useState<{ name: string; strokeWidth: number }>({
     name: "pen",
     strokeWidth: 5,
@@ -30,12 +30,16 @@ export default function DrawLogic() {
   };
 
   const handleMouseDown = (e: any) => {
+    if (!isDrawer) return;
+
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
     setLines([...lines, { tool, color, points: [pos.x, pos.y] }]);
   };
 
   const handleMouseMove = (e: any) => {
+    if (!isDrawer) return;
+
     if (!isDrawing.current) return;
 
     const stage = e.target.getStage();
@@ -54,6 +58,8 @@ export default function DrawLogic() {
   };
 
   const handleMouseUp = () => {
+    if (!isDrawer) return;
+
     isDrawing.current = false;
   };
 
