@@ -27,7 +27,6 @@ const GameDrawingCanvas = ({ isDrawer, className }: GameDrawingCanvasProps) => {
       >
         <Layer>
           {lines.map((line, idx) => {
-            console.log(line);
             return (
               <Line
                 key={idx}
@@ -49,7 +48,7 @@ const GameDrawingCanvas = ({ isDrawer, className }: GameDrawingCanvasProps) => {
       </Stage>
 
       {isDrawer && (
-        <div className="absolute w-15 h-3/8 left-2 top-1/2 flex flex-col items-center justify-between -translate-y-1/2 rounded-lg space-y-2">
+        <div className="absolute w-15 h-4/9 left-2 top-1/2 flex flex-col items-center justify-between -translate-y-1/2 rounded-lg space-y-2">
           <ColorPicker
             className="w-full h-2/3"
             OnColorSelect={handleColorChange}

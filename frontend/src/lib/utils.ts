@@ -8,10 +8,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export const colors = {
   black: "#000000",
-  red: "#ef4444",
-  yellow: "#facc15",
-  blue: "#3b82f6",
   white: "#ffffff",
+  red: "#ef4444",
+  green: "#22c55e",
+  blue: "#3b82f6",
+  yellow: "#facc15",
 };
 
 export const tools = {

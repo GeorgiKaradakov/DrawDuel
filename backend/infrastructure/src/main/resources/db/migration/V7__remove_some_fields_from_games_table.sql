@@ -1,0 +1,7 @@
+ALTER TABLE games
+  DROP COLUMN IF EXISTS totalRounds,
+  DROP COLUMN IF EXISTS currentRound;
+
+ALTER TABLE games
+  ALTER COLUMN total_rounds SET DEFAULT 4,
+  ALTER COLUMN current_round SET DEFAULT 1;

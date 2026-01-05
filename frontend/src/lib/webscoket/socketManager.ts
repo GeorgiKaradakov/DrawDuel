@@ -1,27 +1,33 @@
 import type { ServerMessage } from "./types";
 
 let socket: WebSocket | null = null;
+const listeners: ((data: ServerMessage) => void)[] = [];
 
 export function connectSocket(
-  onMessage: (msg: ServerMessage) => void,
   onOpen?: () => void,
   onClose?: () => void,
-) {
-  if (socket && socket.readyState === WebSocket.OPEN) return socket;
+): WebSocket {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    return socket;
+  }
 
-  socket = new WebSocket("ws://localhost:8080/ws/draw");
+  if (socket && socket.readyState === WebSocket.CONNECTING) {
+    return socket;
+  }
+
+  const token = localStorage.getItem("accessToken");
+  socket = new WebSocket(`ws://localhost:8080/ws/draw?token=${token}`);
 
   socket.onopen = () => {
-    console.log("Connected to WebSocket");
     onOpen?.();
   };
 
   socket.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
-      onMessage(data);
+      listeners.forEach((listener) => listener(data));
     } catch (e) {
-      console.error("Invalid message:", event.data);
+      console.error("Bad WS message:", event.data);
     }
   };
 
@@ -42,8 +48,17 @@ export function sendMessage(data: any) {
   if (socket?.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(data));
   } else {
-    console.warn("WebSocket not ready, message dropped:", data);
+    console.warn("WebSocket not ready — message dropped:", data);
   }
+}
+
+export function addSocketListener(fn: (data: ServerMessage) => void) {
+  if (!listeners.includes(fn)) listeners.push(fn);
+}
+
+export function removeSocketListener(fn: (data: ServerMessage) => void) {
+  const idx = listeners.indexOf(fn);
+  if (idx !== -1) listeners.splice(idx, 1);
 }
 
 export function disconnectSocket() {
@@ -53,6 +68,10 @@ export function disconnectSocket() {
   }
 }
 
-export function getSocket() {
+export function getSocket(): WebSocket | null {
   return socket;
+}
+
+export function isSocketConnected(): boolean {
+  return socket?.readyState === WebSocket.OPEN;
 }

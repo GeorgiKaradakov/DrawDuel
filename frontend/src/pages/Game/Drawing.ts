@@ -1,5 +1,8 @@
 import { sendDrawEvent } from "@/lib/webscoket/gameSocket";
-import { getSocket } from "@/lib/webscoket/socketManager";
+import {
+  addSocketListener,
+  removeSocketListener,
+} from "@/lib/webscoket/socketManager";
 import { useEffect, useRef, useState } from "react";
 
 export default function DrawLogic(isDrawer: boolean) {
@@ -12,13 +15,11 @@ export default function DrawLogic(isDrawer: boolean) {
   const isDrawing = useRef(false);
 
   useEffect(() => {
-    const socket = getSocket();
-    if (!socket) return;
-    console.log(lines);
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+    const handleDraw = (data: any) => {
       if (data.tool && data.points) setLines((prev) => [...prev, data]);
     };
+    addSocketListener(handleDraw);
+    return () => removeSocketListener(handleDraw);
   }, []);
 
   const handleToolChange = (newTool: { name: string; strokeWidth: number }) => {

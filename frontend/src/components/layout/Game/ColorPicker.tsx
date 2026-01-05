@@ -7,7 +7,7 @@ const ColorPicker = ({ className, OnColorSelect }: ColorPickerProps) => {
   return (
     <div
       className={cn(
-        "flex flex-col bg-neutral-700 items-center justify-evenly rounded-xl",
+        "py-2 flex flex-col bg-neutral-700 items-center justify-evenly rounded-xl",
         className,
       )}
     >

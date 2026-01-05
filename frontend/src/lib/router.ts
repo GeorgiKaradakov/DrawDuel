@@ -23,17 +23,24 @@ export const router = createBrowserRouter([
         path: "dashboard",
         Component: Dashboard,
       },
+
       {
-        path: "game/someGameIdWhichWillBeProvidedLater",
-        children: [{ path: "draw", Component: GameDraw }],
-      },
-      {
-        path: "game/someGameIdWhichWillBeProvidedLater",
-        children: [{ path: "guess", Component: GameGuess }],
-      },
-      {
-        path: "find-game/someUserIdWhichWillBeProvidedLater",
+        path: "find-game/:userId",
         Component: FindGame,
+      },
+
+      {
+        path: "game/:gameId",
+        children: [
+          {
+            path: "draw",
+            Component: GameDraw,
+          },
+          {
+            path: "guess",
+            Component: GameGuess,
+          },
+        ],
       },
     ],
   },

@@ -1,3 +1,5 @@
+import type { GuessEntry } from "../globalTypes";
+
 export interface DrawEvent {
   tool: { name: string; strokeWidth: number };
   color: string;
@@ -18,5 +20,6 @@ export interface GameDrawingCanvasProps {
 
 export interface GuessMessageContProps {
   className?: string;
-  guessMessages: string[];
+  guessMessages: GuessEntry[];
+  isDrawer?: boolean;
 }
