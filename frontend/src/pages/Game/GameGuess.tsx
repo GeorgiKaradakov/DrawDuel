@@ -4,14 +4,21 @@ import GuessMessageCont from "@/components/layout/Game/GuessMessageCont";
 import GameTimer from "@/components/layout/Game/GameTimer";
 import {
   addSocketListener,
+  disconnectSocket,
   removeSocketListener,
 } from "@/lib/webscoket/socketManager";
-import type { GuessEntry, RoundResults } from "@/lib/globalTypes";
+import type {
+  GuessEntry,
+  PresentWinnerProps,
+  RoundResults,
+} from "@/lib/globalTypes";
 import WordDisplay from "@/components/layout/Game/WordDisplay";
 import GuesserWaitForWordAnimation from "@/components/layout/Game/GuesserWaitForWordAnimation";
 import { TimerProvider } from "@/context/TimerContext";
 import PresentScores from "@/components/layout/Game/PresentScores";
 import { useNavigate } from "react-router";
+import { sentRoundTimeOut } from "@/lib/webscoket/gameSocket";
+import PresentWinner from "@/components/layout/Game/PresentWinner";
 
 const GameGuess = () => {
   const navigate = useNavigate();
@@ -22,14 +29,27 @@ const GameGuess = () => {
   const [maskedWord, setMaskedWord] = useState<string>("");
   const [roundEnded, setRoundEnded] = useState(false);
   const [roundResults, setRoundResults] = useState<RoundResults | null>(null);
+  const [endGameStats, setEndGameStats] = useState<PresentWinnerProps>({
+    playerAName: "",
+    playerBName: "",
+    playerAScore: 0,
+    playerBScore: 0,
+    playerId: "",
+    winner: "",
+  });
+  const [endGame, setEndGame] = useState(false);
 
   useEffect(() => {
+    setRoundStarted(false);
+    setRoundEnded(false);
     const handleSocket = (data: any) => {
       if (data.type === "waitingForWord" && data.role === "guesser") {
         setWaiting(true);
       } else if (data.type === "wordChoice" && data.role === "drawer") {
         console.log(data);
-        navigate(`/game/${data.gameId}/draw`, { state: { words: data.words } });
+        navigate(`/game/${data.gameId}/draw`, {
+          state: { words: data.words, wordPickCountDown: data.countdown },
+        });
       }
 
       if (data.type === "startRound" && data.role === "guesser") {
@@ -64,11 +84,42 @@ const GameGuess = () => {
           });
         }, 500);
       }
+
+      if (data.type === "gameEnd") {
+        setEndGame(true);
+        setEndGameStats({
+          playerAName: data.playerAName,
+          playerBName: data.playerBName,
+          playerAScore: data.playerAScore,
+          playerBScore: data.playerBScore,
+          playerId: data.playerId,
+          winner: data.winner,
+        });
+      }
     };
 
     addSocketListener(handleSocket);
     return () => removeSocketListener(handleSocket);
   }, []);
+
+  if (endGame) {
+    return (
+      <PresentWinner
+        playerAName={endGameStats.playerAName}
+        playerBName={endGameStats.playerBName}
+        playerAScore={endGameStats.playerAScore}
+        playerBScore={endGameStats.playerBScore}
+        winner={endGameStats.winner}
+        onPlayAgain={function (): void {
+          navigate(`/find-game/${endGameStats.playerId}`);
+          disconnectSocket();
+        }}
+        onReturnToDashboard={function (): void {
+          navigate("/dashboard");
+        }}
+      />
+    );
+  }
 
   if (waiting && !roundStarted) {
     return <GuesserWaitForWordAnimation />;
@@ -84,7 +135,10 @@ const GameGuess = () => {
             isMasked={true}
           />
           <GameDrawingCanvas isDrawer={false} />
-          <GameTimer countDownSeconds={roundTime} />
+          <GameTimer
+            countDownSeconds={roundTime}
+            onTimeUp={() => sentRoundTimeOut(guesses.length)}
+          />
           <GuessMessageCont
             className="z-10 w-1/4 h-1/3 bg-black/30 backdrop-blur-sm"
             guessMessages={guesses}

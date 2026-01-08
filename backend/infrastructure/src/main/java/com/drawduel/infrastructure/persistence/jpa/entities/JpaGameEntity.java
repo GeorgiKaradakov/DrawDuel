@@ -51,19 +51,4 @@ public class JpaGameEntity {
   private Instant startedAt = Instant.now();
 
   private Instant endedAt;
-
-  public void addScores(int drawerPoints, int guesserPoints, boolean drawerIsPlayerA) {
-    if (drawerIsPlayerA) {
-      this.playerADrawPoints += drawerPoints;
-      this.playerBGuessPoints += guesserPoints;
-    } else {
-      this.playerBDrawPoints += drawerPoints;
-      this.playerAGuessPoints += guesserPoints;
-    }
-  }
-
-  public void finish() {
-    this.status = GameStatus.FINISHED;
-    this.endedAt = Instant.now();
-  }
 }

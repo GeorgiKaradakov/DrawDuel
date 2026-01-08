@@ -8,7 +8,7 @@ import {
 } from "@/lib/webscoket/socketManager";
 import type { ServerMessage } from "@/lib/webscoket/types";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 const FindGame = () => {
   const [searching, setSearching] = useState(false);
@@ -16,13 +16,11 @@ const FindGame = () => {
   const { userId } = useParams();
 
   useEffect(() => {
-    // 1️⃣ Ensure socket connection exists
     connectSocket(
       () => console.log("Socket opened for matchmaking"),
       () => setSearching(false),
     );
 
-    // 2️⃣ Define a single listener for messages
     const handleMessage = (data: ServerMessage) => {
       if (data.type === "waiting") {
         setSearching(true);
@@ -30,6 +28,17 @@ const FindGame = () => {
 
       if (data.type === "sendToDraw") {
         navigate(`/game/${data.gameId}/draw`);
+      }
+
+      if (data.type === "wordChoice" && data.role === "drawer") {
+        console.log("📝 [FindGame] WORD CHOICE RECEIVED");
+
+        navigate(`/game/${data.gameId}/draw`, {
+          state: {
+            words: data.words,
+            wordPickCountDown: data.countdown,
+          },
+        });
       }
 
       if (data.type === "sendToGuess") {

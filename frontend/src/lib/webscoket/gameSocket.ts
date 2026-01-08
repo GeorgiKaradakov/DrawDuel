@@ -20,3 +20,7 @@ export function sendDrawEvent(event: DrawEvent) {
 export function sendGuess(guess: string, timeLeft: number, guessCount: number) {
   sendMessage({ type: "guess", guess, timeLeft, guessCount });
 }
+
+export function sentRoundTimeOut(guessCount: number) {
+  sendMessage({ type: "timeUpRound", guessCount });
+}

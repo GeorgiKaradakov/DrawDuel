@@ -1,41 +1,41 @@
 package com.drawduel.infrastructure.persistence.websocket;
 
+import com.drawduel.application.dtos.GameDto;
+import com.drawduel.application.ports.CreateGameUseCasePort;
+import com.drawduel.application.ports.UpdateGameUseCasePort;
 import com.drawduel.application.services.JwtService;
-import com.drawduel.domain.enums.GameStatus;
-import com.drawduel.infrastructure.persistence.jpa.entities.JpaGameEntity;
-import com.drawduel.infrastructure.persistence.jpa.repositories.GameJpaRepository;
+import com.drawduel.domain.models.Round;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 @Component
+@RequiredArgsConstructor
 public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
 
+  private static final long ROUND_TIMEOUT_SECONDS = 60;
+  private static final long WORD_CHOICE_TIMEOUT_SECONDS = 10;
+
   private final JwtService jwtService;
-  private final GameJpaRepository gameRepository;
+  private final CreateGameUseCasePort createGameUseCase;
+  private final UpdateGameUseCasePort updateGameUseCase;
   private final ObjectMapper mapper = new ObjectMapper();
 
   private final Queue<UUID> waitingPlayers = new ConcurrentLinkedQueue<>();
   private final Map<UUID, WebSocketSession> playerSessions = new ConcurrentHashMap<>();
   private final Map<WebSocketSession, UUID> sessionPlayers = new ConcurrentHashMap<>();
-  private final Map<String, GameRoom> games = new ConcurrentHashMap<>();
+  private final Map<String, Round> activeRounds = new ConcurrentHashMap<>();
+  private final Map<String, GameDto> activeGames = new ConcurrentHashMap<>();
   private final Map<UUID, String> usernames = new ConcurrentHashMap<>();
-
-  private record GameRoom(
-      String gameId, UUID drawerId, UUID guesserId, String chosenWord, int roundNumber) {}
 
   private static final List<String> WORD_POOL =
       List.of("apple", "house", "dog", "car", "computer", "sun", "banana", "tree", "cat", "phone");
-
-  public DrawDuelWebSocketHandler(JwtService jwtService, GameJpaRepository gameRepository) {
-    this.jwtService = jwtService;
-    this.gameRepository = gameRepository;
-  }
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws IOException {
@@ -69,6 +69,15 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
       case "search" -> handlePlayerSearch(UUID.fromString(node.get("userId").asText()), session);
       case "chooseWord" -> handleWordChoice(session, node.get("word").asText());
       case "timeUpWordChoice" -> handleWordChoiceTimeout(session, node.get("words"));
+      case "timeUpRound" -> {
+        UUID playerId = sessionPlayers.get(session);
+        Round round =
+            activeRounds.values().stream()
+                .filter(r -> r.getDrawerId().equals(playerId) || r.getGuesserId().equals(playerId))
+                .findFirst()
+                .orElse(null);
+        if (round != null) handleRoundTimeout(round);
+      }
       case "draw" -> handleDraw(session, message);
       case "guess" -> handleGuess(session, node);
     }
@@ -86,33 +95,29 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
       return;
     }
 
-    UUID gameId = UUID.randomUUID();
+    System.out.println("Session hash: " + session.hashCode());
     boolean player1IsDrawer = new Random().nextBoolean();
     UUID drawerId = player1IsDrawer ? playerId : waiting;
     UUID guesserId = player1IsDrawer ? waiting : playerId;
 
-    JpaGameEntity gameEntity = new JpaGameEntity();
-    gameEntity.setId(gameId);
-    gameEntity.setPlayerAId(drawerId);
-    gameEntity.setPlayerBId(guesserId);
-    gameEntity.setStatus(GameStatus.IN_PROGRESS);
-    gameRepository.save(gameEntity);
+    GameDto game =
+        createGameUseCase.handle(new CreateGameUseCasePort.Query(drawerId, guesserId)).gameDto();
+    activeGames.put(game.id().toString(), game);
 
-    startNewRound(gameEntity, drawerId, guesserId, 1);
+    startNewRound(game, drawerId, guesserId, 1);
   }
 
-  private void startNewRound(
-      JpaGameEntity gameEntity, UUID drawerId, UUID guesserId, int roundNumber) throws IOException {
-    GameRoom room =
-        new GameRoom(gameEntity.getId().toString(), drawerId, guesserId, null, roundNumber);
-    games.put(room.gameId(), room);
+  private void startNewRound(GameDto game, UUID drawerId, UUID guesserId, int roundNumber)
+      throws IOException {
+    Round round =
+        new Round(UUID.fromString(game.id().toString()), drawerId, guesserId, roundNumber);
+    activeRounds.put(game.id().toString(), round);
 
     List<String> randomWords = pickRandomWords(3);
 
-    if (roundNumber <= 1) {
-      sendToPlayer(drawerId, Map.of("type", "sendToDraw", "gameId", room.gameId()));
-
-      sendToPlayer(guesserId, Map.of("type", "sendToGuess", "gameId", room.gameId()));
+    if (roundNumber == 1) {
+      sendToPlayer(drawerId, Map.of("type", "sendToDraw", "gameId", game.id().toString()));
+      sendToPlayer(guesserId, Map.of("type", "sendToGuess", "gameId", game.id().toString()));
     }
 
     sendToPlayer(
@@ -121,13 +126,13 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
             "type",
             "wordChoice",
             "gameId",
-            room.gameId(),
+            game.id().toString(),
             "role",
             "drawer",
             "words",
             randomWords,
             "countdown",
-            10,
+            WORD_CHOICE_TIMEOUT_SECONDS,
             "round",
             roundNumber));
 
@@ -137,13 +142,13 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
             "type",
             "waitingForWord",
             "gameId",
-            room.gameId(),
+            game.id().toString(),
             "role",
             "guesser",
             "message",
             "Waiting for drawer to choose a word...",
             "countdown",
-            10,
+            WORD_CHOICE_TIMEOUT_SECONDS,
             "round",
             roundNumber));
 
@@ -151,19 +156,20 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
         "Round %d started | Drawer: %s | Guesser: %s%n", roundNumber, drawerId, guesserId);
   }
 
+  private void handleRoundTimeout(Round round) throws IOException {
+    System.out.println("Round time expired for game " + round.getId());
+
+    Map<String, Integer> scores =
+        calculateRoundPoints(0, (int) ROUND_TIMEOUT_SECONDS, round.getGuessCount());
+    processRoundEnd(round, round.getDrawerId(), round.getGuesserId(), scores);
+  }
+
   private void handleWordChoice(WebSocketSession session, String chosenWord) throws IOException {
     UUID drawerId = sessionPlayers.get(session);
-    UUID guesserId = getOpponent(drawerId);
-    if (guesserId == null) return;
+    Round round = findRoundByDrawer(drawerId);
+    if (round == null) return;
 
-    GameRoom room =
-        games.values().stream().filter(g -> g.drawerId.equals(drawerId)).findFirst().orElse(null);
-    if (room == null) return;
-
-    GameRoom updated =
-        new GameRoom(
-            room.gameId(), room.drawerId(), room.guesserId(), chosenWord, room.roundNumber());
-    games.put(room.gameId(), updated);
+    round.setChosenWord(chosenWord);
 
     sendToPlayer(
         drawerId,
@@ -171,33 +177,31 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
             "type",
             "startRound",
             "gameId",
-            room.gameId(),
+            round.getId().toString(),
             "role",
             "drawer",
             "word",
             chosenWord,
             "countdown",
-            60,
+            ROUND_TIMEOUT_SECONDS,
             "round",
-            room.roundNumber()));
+            round.getRoundNumber()));
 
     sendToPlayer(
-        guesserId,
+        round.getGuesserId(),
         Map.of(
             "type",
             "startRound",
             "gameId",
-            room.gameId(),
+            round.getId().toString(),
             "role",
             "guesser",
             "wordLength",
             chosenWord.length(),
             "countdown",
-            60,
+            ROUND_TIMEOUT_SECONDS,
             "round",
-            room.roundNumber()));
-
-    System.out.println("Drawer chose word '" + chosenWord + "' for game " + room.gameId());
+            round.getRoundNumber()));
   }
 
   private void handleWordChoiceTimeout(WebSocketSession session, JsonNode wordsNode)
@@ -206,14 +210,7 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
     List<String> offered = new ArrayList<>();
     wordsNode.forEach(n -> offered.add(n.asText()));
     String randomWord = offered.get(new Random().nextInt(offered.size()));
-    System.out.println("Drawer timed out — randomly picked: " + randomWord);
     handleWordChoice(session, randomWord);
-  }
-
-  private List<String> pickRandomWords(int count) {
-    List<String> shuffled = new ArrayList<>(WORD_POOL);
-    Collections.shuffle(shuffled);
-    return shuffled.subList(0, Math.min(count, shuffled.size()));
   }
 
   private void handleDraw(WebSocketSession session, TextMessage message) throws IOException {
@@ -230,66 +227,66 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
     int guessCount = node.get("guessCount").asInt();
 
     UUID guesserId = sessionPlayers.get(session);
-    UUID drawerId = getOpponent(guesserId);
-    if (drawerId == null) return;
+    Round round = findRoundByGuesser(guesserId);
+    if (round == null || round.getChosenWord() == null) return;
 
-    GameRoom room =
-        games.values().stream().filter(g -> g.guesserId.equals(guesserId)).findFirst().orElse(null);
-    if (room == null || room.chosenWord() == null) return;
-
-    boolean correct = guess.equalsIgnoreCase(room.chosenWord());
+    boolean correct = guess.equalsIgnoreCase(round.getChosenWord());
+    round.incrementGuessCount();
     String playerName = usernames.getOrDefault(guesserId, "Unknown");
 
     sendToBothPlayers(
-        drawerId,
+        round.getDrawerId(),
         guesserId,
         Map.of(
-            "type", "guessMessage",
-            "guess", guess,
-            "correct", correct,
-            "playerName", playerName));
+            "type", "guessMessage", "guess", guess, "correct", correct, "playerName", playerName));
 
     if (correct) {
-      Map<String, Integer> scores = calculateRoundPoints(timeLeft, 60, guessCount);
-      processRoundEnd(room, drawerId, guesserId, scores);
+      Map<String, Integer> scores =
+          calculateRoundPoints(timeLeft, (int) ROUND_TIMEOUT_SECONDS, round.getGuessCount());
+      processRoundEnd(round, round.getDrawerId(), guesserId, scores);
     }
   }
 
   private void processRoundEnd(
-      GameRoom room, UUID drawerId, UUID guesserId, Map<String, Integer> scores)
-      throws IOException {
-    UUID gameId = UUID.fromString(room.gameId());
-    JpaGameEntity gameEntity = gameRepository.findById(gameId).orElseThrow();
+      Round round, UUID drawerId, UUID guesserId, Map<String, Integer> scores) throws IOException {
+    GameDto game = activeGames.get(round.getId().toString());
+    boolean drawerIsPlayerA = game.playerAId().equals(drawerId);
 
-    boolean drawerIsPlayerA = gameEntity.getPlayerAId().equals(drawerId);
-    gameEntity.addScores(scores.get("drawerPoints"), scores.get("guesserPoints"), drawerIsPlayerA);
-
-    int nextRound = room.roundNumber() + 1;
-    gameEntity.setCurrentRound(nextRound);
-    gameRepository.save(gameEntity);
+    GameDto updatedGame =
+        updateGameUseCase
+            .handle(
+                new UpdateGameUseCasePort.Query(
+                    round.getId(),
+                    scores.get("drawerPoints"),
+                    scores.get("guesserPoints"),
+                    drawerIsPlayerA))
+            .gameDto();
+    activeGames.put(updatedGame.id().toString(), updatedGame);
 
     sendToBothPlayers(
         drawerId,
         guesserId,
         Map.of(
-            "type", "roundEnd",
-            "drawerName", usernames.get(drawerId),
-            "guesserName", usernames.get(guesserId),
-            "drawerScore", scores.get("drawerPoints"),
-            "guesserScore", scores.get("guesserPoints")));
+            "type",
+            "roundEnd",
+            "drawerName",
+            usernames.get(drawerId),
+            "guesserName",
+            usernames.get(guesserId),
+            "drawerScore",
+            scores.get("drawerPoints"),
+            "guesserScore",
+            scores.get("guesserPoints")));
 
-    System.out.printf(
-        "Round %d ended | Drawer: %d | Guesser: %d%n",
-        room.roundNumber(), scores.get("drawerPoints"), scores.get("guesserPoints"));
-
-    if (nextRound <= gameEntity.getTotalRounds()) {
+    int nextRound = round.getRoundNumber() + 1;
+    if (nextRound <= updatedGame.totalRounds()) {
+      activeRounds.remove(round.getId().toString());
       new Timer()
           .schedule(
               new TimerTask() {
-                @Override
                 public void run() {
                   try {
-                    startNewRound(gameEntity, guesserId, drawerId, nextRound);
+                    startNewRound(updatedGame, guesserId, drawerId, nextRound);
                   } catch (IOException e) {
                     e.printStackTrace();
                   }
@@ -297,45 +294,82 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
               },
               5500);
     } else {
-      endGame(gameEntity);
+      activeRounds.remove(round.getId().toString());
+      activeGames.remove(game.id().toString());
+      endGame(updatedGame);
     }
   }
 
-  private void endGame(JpaGameEntity gameEntity) throws IOException {
-    gameEntity.finish();
-    int playerATotal = gameEntity.getPlayerADrawPoints() + gameEntity.getPlayerAGuessPoints();
-    int playerBTotal = gameEntity.getPlayerBDrawPoints() + gameEntity.getPlayerBGuessPoints();
+  private void endGame(GameDto game) throws IOException {
+    int playerATotal = game.playerADrawPoints() + game.playerAGuessPoints();
+    int playerBTotal = game.playerBDrawPoints() + game.playerBGuessPoints();
 
     UUID winner =
         playerATotal == playerBTotal
             ? null
-            : (playerATotal > playerBTotal ? gameEntity.getPlayerAId() : gameEntity.getPlayerBId());
-    gameEntity.setWinnerId(winner);
-    gameRepository.save(gameEntity);
+            : (playerATotal > playerBTotal ? game.playerAId() : game.playerBId());
 
-    sendToBothPlayers(
-        gameEntity.getPlayerAId(),
-        gameEntity.getPlayerBId(),
+    sendToPlayer(
+        game.playerAId(),
         Map.of(
             "type",
             "gameEnd",
             "playerAName",
-            usernames.get(gameEntity.getPlayerAId()),
+            usernames.get(game.playerAId()),
             "playerBName",
-            usernames.get(gameEntity.getPlayerBId()),
+            usernames.get(game.playerBId()),
             "playerAScore",
             playerATotal,
             "playerBScore",
             playerBTotal,
+            "playerId",
+            game.playerAId().toString(),
+            "winner",
+            winner == null ? "Draw" : usernames.get(winner)));
+
+    sendToPlayer(
+        game.playerBId(),
+        Map.of(
+            "type",
+            "gameEnd",
+            "playerAName",
+            usernames.get(game.playerAId()),
+            "playerBName",
+            usernames.get(game.playerBId()),
+            "playerAScore",
+            playerATotal,
+            "playerBScore",
+            playerBTotal,
+            "playerId",
+            game.playerBId().toString(),
             "winner",
             winner == null ? "Draw" : usernames.get(winner)));
 
     System.out.printf(
         "Game %s ended — Winner: %s (%d:%d)%n",
-        gameEntity.getId(),
-        winner == null ? "Draw" : usernames.get(winner),
-        playerATotal,
-        playerBTotal);
+        game.id(), winner == null ? "Draw" : usernames.get(winner), playerATotal, playerBTotal);
+  }
+
+  private Round findRoundByDrawer(UUID drawerId) {
+    return activeRounds.values().stream()
+        .filter(r -> r.getDrawerId().equals(drawerId))
+        .findFirst()
+        .orElse(null);
+  }
+
+  private Round findRoundByGuesser(UUID guesserId) {
+    return activeRounds.values().stream()
+        .filter(r -> r.getGuesserId().equals(guesserId))
+        .findFirst()
+        .orElse(null);
+  }
+
+  private UUID getOpponent(UUID playerId) {
+    return activeRounds.values().stream()
+        .filter(r -> r.getDrawerId().equals(playerId) || r.getGuesserId().equals(playerId))
+        .map(r -> r.getDrawerId().equals(playerId) ? r.getGuesserId() : r.getDrawerId())
+        .findFirst()
+        .orElse(null);
   }
 
   private void sendToPlayer(UUID playerId, Map<String, Object> payload) throws IOException {
@@ -352,12 +386,10 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
     }
   }
 
-  private UUID getOpponent(UUID playerId) {
-    return games.values().stream()
-        .filter(g -> g.drawerId.equals(playerId) || g.guesserId.equals(playerId))
-        .map(g -> g.drawerId.equals(playerId) ? g.guesserId : g.drawerId)
-        .findFirst()
-        .orElse(null);
+  private List<String> pickRandomWords(int count) {
+    List<String> shuffled = new ArrayList<>(WORD_POOL);
+    Collections.shuffle(shuffled);
+    return shuffled.subList(0, Math.min(count, shuffled.size()));
   }
 
   private Map<String, Integer> calculateRoundPoints(int timeLeft, int totalTime, int guessCount) {

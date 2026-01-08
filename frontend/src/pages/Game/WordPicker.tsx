@@ -3,7 +3,7 @@ import type { WordPickerProps } from "./types";
 import GameTimer from "@/components/layout/Game/GameTimer";
 import { useRef } from "react";
 
-const WordPicker = ({ words }: WordPickerProps) => {
+const WordPicker = ({ words, wordPickTime }: WordPickerProps) => {
   const hasChosen = useRef(false);
 
   const handleWordClick = (word: string) => {
@@ -22,7 +22,7 @@ const WordPicker = ({ words }: WordPickerProps) => {
       id="word-picker"
       className="fixed inset-0 flex flex-col justify-evenly items-center bg-black/80 z-10"
     >
-      <GameTimer countDownSeconds={10} onTimeUp={handleTimeUp} />
+      <GameTimer countDownSeconds={wordPickTime} onTimeUp={handleTimeUp} />
       <p className="text-4xl text-neutral-50 font-bold">Pick a word to draw!</p>
       <div className="w-2/3 h-3/5 grid grid-cols-2 gap-2 place-items-center">
         {words.map((w, i) => (
