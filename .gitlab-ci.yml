@@ -45,21 +45,36 @@ unit_tests:
 
 integration_tests:
   stage: test_integration
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    TESTCONTAINERS_RYUK_DISABLED: "true"
+
   before_script:
+    - apk add --no-cache openjdk21 curl bash git
     - cd backend/tests
     - export $(grep -v '^#' .env | xargs)
     - cd ..
+
   script:
     - echo "🐘 Running integration + controller tests with Testcontainers..."
+    - docker info  # IMPORTANT: verifies testcontainers can see Docker
     - gradle :tests:test --tests "*IntegrationTest" --tests "*ControllerTest" --rerun-tasks
+
   tags: [tests]
+
   artifacts:
     when: always
     reports:
-      junit: backend/build/test-results/test/
+      junit: backend/tests/build/test-results/test/
+
   needs:
     - job: unit_tests
       artifacts: false
+
   only:
     - dev
     - main
