@@ -33,7 +33,7 @@ unit_tests:
   script:
     - echo "⚡ Running unit tests..."
     - gradle :tests:test --tests "*ServiceTest" --tests "*UseCaseTest" --rerun-tasks
-  tags: [docker]
+  tags: [tests]
   artifacts:
     when: always
     reports:
@@ -65,7 +65,7 @@ integration_tests:
     - docker info   # Important: verify Testcontainers sees Docker
     - gradle :tests:test --tests "*IntegrationTest" --tests "*ControllerTest" --rerun-tasks
 
-  tags: [docker]
+  tags: [tests]
 
   artifacts:
     when: always
@@ -88,7 +88,7 @@ build_stage:
   script:
     - echo "🏗️ Building backend JAR..."
     - gradle clean build -x test
-  tags: [docker]
+  tags: [build]
   artifacts:
     paths:
       - backend/build/libs/
@@ -105,7 +105,7 @@ deploy:
 
   # IMPORTANT: override the default Gradle image
   image: docker:24.0.5
-  tags: [docker]
+  tags: [deploy]
 
   services:
     - docker:24.0.5-dind
