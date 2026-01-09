@@ -3,7 +3,8 @@ spring:
     banner-mode: "off"
 
   config:
-    import: optional:file:.env[.properties]
+    - optional:file:.env.local[.properties]
+    - optional:file:.env.docker[.properties]
 
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}

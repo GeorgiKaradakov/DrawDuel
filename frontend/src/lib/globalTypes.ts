@@ -1,5 +1,3 @@
-import type { UUID } from "crypto";
-
 export interface GuessEntry {
   playerName: string;
   guess: string;

@@ -49,4 +49,20 @@ bootRun {
         "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005"
     ]
   }
+systemProperty "spring.profiles.active", "local"
+
+  def envFile = file(".env.local")
+
+  if (envFile.exists()) {
+      println "Loading environment variables from .env.local"
+      envFile.eachLine { line ->
+          if (line && !line.startsWith("#") && line.contains("=")) {
+              def (key, value) = line.split("=", 2)
+              environment key.trim(), value.trim()
+              println " -> loaded $key"
+          }
+      }
+  } else {
+      println "WARNING: .env.local not found"
+  }
 }

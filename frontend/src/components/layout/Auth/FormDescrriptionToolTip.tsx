@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 const FormDescrriptionToolTip = ({
   children,
   description,
-  className,
   textStyle,
 }: FormDescriptionToolTipProps) => {
   if (!description || description.trim().length <= 0) return children;

@@ -9,6 +9,6 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "stict": true,
+    "strict": true,
   }
 }

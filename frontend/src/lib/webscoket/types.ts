@@ -6,12 +6,13 @@ export interface DrawEvent {
   points: number[];
 }
 
-export type ServerMessage =
-  | { type: "waiting"; message: string }
-  | { type: "start"; message: string }
-  | { type: "disconnect"; message: string }
-  | { type: "error"; message: string }
-  | DrawEvent;
+export interface ServerMessage {
+  type: string;
+  gameId?: string;
+  role?: "drawer" | "guesser";
+  words?: string[];
+  countdown?: number;
+}
 
 export interface GameDrawingCanvasProps {
   isDrawer: boolean;

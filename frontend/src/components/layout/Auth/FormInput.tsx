@@ -2,7 +2,6 @@ import type { FieldValues } from "react-hook-form";
 import type { FormInputProps } from "./types";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,

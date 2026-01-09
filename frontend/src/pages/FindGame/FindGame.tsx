@@ -8,7 +8,7 @@ import {
 } from "@/lib/webscoket/socketManager";
 import type { ServerMessage } from "@/lib/webscoket/types";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 const FindGame = () => {
   const [searching, setSearching] = useState(false);
