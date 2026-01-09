@@ -62,6 +62,25 @@ integration_tests:
     - main
     - merge_requests
 
+build_stage:
+  stage: build
+  before_script:
+    - cd backend
+  script:
+    - echo "🏗️ Building backend JAR..."
+    - gradle clean build -x test
+  tags: [build]
+  artifacts:
+    paths:
+      - backend/build/libs/
+    expire_in: 1 week
+  needs:
+    - job: integration_tests
+      artifacts: false
+  only:
+    - dev
+    - main
+
 deploy:
   stage: deploy
   image: docker:24.0.5
@@ -76,18 +95,17 @@ deploy:
     - echo "Logging in to Docker Hub..."
     - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
-    # Build backend
+    - echo "📦 Building Docker images..."
     - docker build -t $DOCKERHUB_USERNAME/drawduel-backend:latest backend
-    # Build frontend
     - docker build -t $DOCKERHUB_USERNAME/drawduel-frontend:latest frontend
 
-    # Push images
+    - echo "⬆️ Pushing images to Docker Hub..."
     - docker push $DOCKERHUB_USERNAME/drawduel-backend:latest
     - docker push $DOCKERHUB_USERNAME/drawduel-frontend:latest
 
   needs:
-    - job: build_backend
-      artifacts: false
+    - job: build_stage
+      artifacts: true
 
   only:
     - main
