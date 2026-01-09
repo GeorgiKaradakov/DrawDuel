@@ -16,6 +16,8 @@ Thumbs.db
 # OS junk
 ehthumbs.db
 desktop.ini
+builds/
+cache/
 
 # ---------------------------
 # Eclipse / Buildship (Java IDE)

@@ -54,12 +54,6 @@ integration_tests:
     DOCKER_TLS_CERTDIR: ""
     TESTCONTAINERS_RYUK_DISABLED: "true"
 
-  before_script:
-    - apk add --no-cache openjdk17 curl bash git
-    - cd backend/tests
-    - export $(grep -v '^#' .env | xargs)
-    - cd ..
-
   script:
     - echo "🐘 Running integration + controller tests with Testcontainers..."
     - docker info   # Important: verify Testcontainers sees Docker
