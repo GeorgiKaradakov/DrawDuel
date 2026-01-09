@@ -82,7 +82,7 @@ build_stage:
     - main
 
 deploy:
-  tags: build #no deploy task in the runner
+  tags: [deploy] # no deploy task in the runner
   stage: deploy
   image: docker:24.0.5
   services:
