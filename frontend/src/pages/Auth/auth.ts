@@ -31,8 +31,6 @@ export const register = async (
       repeatPass: passRepeat,
     });
 
-    console.log(response.data);
-
     const { accessToken } = response.data;
     setAccessToken(accessToken);
     return accessToken;

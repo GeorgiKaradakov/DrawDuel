@@ -1,109 +1,112 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { getDashboardData } from "./dashboard";
-import DashboardCard from "@/components/layout/Dashboard/components/DashboardCard";
 import Navbar from "@/components/layout/General/Navbar";
-import {
-  chartData,
-  leaderboardColumns,
-  leaderboardData,
-  Matches,
-  MatchesColumns,
-} from "./temp-data";
+import DashboardCard from "@/components/layout/Dashboard/components/DashboardCard";
+import { getDashboardData } from "./dashboard";
+import type { DashboardResponse } from "@/lib/globalTypes";
+
+const leaderboardColumns = [
+  { key: "rank", label: "Rank" },
+  { key: "userName", label: "Username" },
+  { key: "score", label: "Score" },
+  { key: "wins", label: "Wins" },
+];
+
+const matchesColumns = [
+  { key: "matchId", label: "Match ID" },
+  { key: "drawPoints", label: "Draw Points" },
+  { key: "guessPoints", label: "Guess Points" },
+  { key: "outcome", label: "Outcome" },
+];
 
 const Dashboard = () => {
-  // const [message, setMessage] = useState<string | null>(null);
-  // const [error, setError] = useState<string | null>(null);
-  // const navigate = useNavigate();
-  //
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const text = await getDashboardData();
-  //       setMessage(text);
-  //     } catch (err) {
-  //       // If error occurs (e.g., 401 Unauthorized), redirect to login
-  //       setError(error);
-  //     }
-  //   };
-  //
-  //   fetchData();
-  // }, [navigate]);
-  //
-  // if (error) {
-  //   return (
-  //     <div className="w-screen h-screen flex justify-center items-center bg-neutral-700 text-red-500 text-5xl text-bold">
-  //       {error}
-  //     </div>
-  //   );
-  // }
-  //
-  // if (!message) {
-  //   return (
-  //     <div className="flex justify-center items-center h-screen text-neutral-400 text-xl">
-  //       Loading dashboard...
-  //     </div>
-  //   );
-  // }
+  const navigate = useNavigate();
+
+  const [data, setData] = useState<DashboardResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getDashboardData()
+      .then(setData)
+      .catch((err) => {
+        console.error("Dashboard load failed:", err.message);
+        setError("Failed to load dashboard");
+        navigate("/auth/login");
+      });
+  }, [navigate]);
+
+  if (error) {
+    return (
+      <div className="w-screen h-screen flex justify-center items-center bg-neutral-700 text-red-500 text-4xl font-bold">
+        {error}
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="w-screen h-screen flex justify-center items-center text-neutral-400 text-xl">
+        Loading dashboard...
+      </div>
+    );
+  }
+
+  const { stats, leaderboard, recentMatches, chartData } = data;
 
   return (
     <div className="w-screen h-screen flex bg-neutral-700">
       <Navbar />
+
       <div className="w-full h-full grid grid-cols-4 grid-rows-5 p-4">
-        <div className="col-span-4 row-span-3 flex items-center justify-evenly gap-x-4">
+        {/* TOP SECTION */}
+        <div className="col-span-4 row-span-3 flex gap-4">
           <DashboardCard
             type="table"
             title="Leaderboard"
-            tableData={leaderboardData}
+            tableData={leaderboard}
             tableColumns={leaderboardColumns}
             tableHeight="max-h-[85%]"
-            className="col-span-2 rounded-2xl w-[48%] h-[85%]"
+            className="w-[48%] h-[85%] rounded-2xl"
           />
 
-          <div className=" w-[48%] h-[85%] col-span-2 grid grid-cols-2 grid-rows-2 gap-6">
+          <div className="w-[48%] h-[85%] grid grid-cols-2 grid-rows-2 gap-6">
             <DashboardCard
               type="number"
-              title="Total matches"
-              number={12}
-              className="rounded-2xl"
+              title="Total Matches"
+              number={stats.totalMatches}
             />
-
             <DashboardCard
               type="number"
-              title="Win/Loss ratio"
-              number={0.5}
-              percantege={true}
-              className="rounded-2xl"
+              title="Win / Loss Ratio"
+              number={stats.winLossRatio}
+              percantege
             />
-
             <DashboardCard
               type="number"
               title="Total Wins"
-              number={6}
-              className="rounded-2xl"
+              number={stats.totalWins}
             />
-
             <DashboardCard
               type="number"
-              title="Total losses"
-              number={6}
-              className="rounded-2xl"
+              title="Total Losses"
+              number={stats.totalLosses}
             />
           </div>
         </div>
 
-        <div className="col-span-2 row-span-3 flex justify-center items-center px-4">
+        {/* BOTTOM SECTION */}
+        <div className="col-span-2 row-span-3 px-4">
           <DashboardCard
             type="table"
             title="Recent Matches"
-            tableData={Matches}
-            tableColumns={MatchesColumns}
+            tableData={recentMatches}
+            tableColumns={matchesColumns}
             tableHeight="max-h-[82%]"
             className="rounded-2xl w-full h-[95%]"
           />
         </div>
 
-        <div className="col-span-2 row-span-3 flex justify-center items-center px-4">
+        <div className="col-span-2 row-span-3 px-4">
           <DashboardCard
             type="chart"
             title="Games Played Per Day"

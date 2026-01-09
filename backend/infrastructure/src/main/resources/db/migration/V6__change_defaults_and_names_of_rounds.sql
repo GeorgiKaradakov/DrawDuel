@@ -1,0 +1,8 @@
+ALTER TABLE games
+  RENAME COLUMN current_rounds TO current_round;
+
+ALTER TABLE games
+  ADD COLUMN totalRounds INTEGER NOT NULL DEFAULT 4,
+  ADD COLUMN currentRound INTEGER NOT NULL DEFAULT 1;
+
+
