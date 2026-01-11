@@ -3,6 +3,7 @@ package com.drawduel.tests;
 import com.drawduel.infrastructure.Application;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -11,10 +12,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 @SpringBootTest(classes = Application.class)
+@ActiveProfiles("test")
 public abstract class BaseIntegrationTest {
 
   @Container
-  protected static final PostgreSQLContainer<?> POSTGRES =
+  private static final PostgreSQLContainer<?> POSTGRES =
       new PostgreSQLContainer<>("postgres:16-alpine")
           .withDatabaseName("drawduel_test")
           .withUsername("testuser")
