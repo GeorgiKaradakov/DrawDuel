@@ -9,6 +9,7 @@ import { TimerProvider } from "@/context/TimerContext";
 import GameDrawingCanvas from "@/components/layout/Game/GameDrawingCanvas";
 import { useGame } from "./context/useGame";
 import { disconnectSocket } from "@/lib/webscoket/socketManager";
+import { sendLeaveGame } from "@/lib/webscoket/gameSocket";
 
 const GameDraw = () => {
   const { state, dispatch } = useGame();
@@ -24,12 +25,12 @@ const GameDraw = () => {
         winner={state.endGameStats.winner}
         onPlayAgain={function (): void {
           dispatch({ type: "RESET" });
-          disconnectSocket();
+          sendLeaveGame();
           navigate(`/find-game/${state.endGameStats.playerId}`);
         }}
         onReturnToDashboard={function (): void {
           dispatch({ type: "RESET" });
-          disconnectSocket();
+          sendLeaveGame();
           navigate("/dashboard");
         }}
       />
@@ -46,7 +47,10 @@ const GameDraw = () => {
       )}
       <>
         {state.roundStarted && (
-          <WordDisplay className="top-20" word={state.chosenWord!} />
+          <WordDisplay
+            className="top-20 w-1/4 border-0"
+            word={state.chosenWord!}
+          />
         )}
         <GameDrawingCanvas isDrawer={true} />
         {state.roundStarted && (

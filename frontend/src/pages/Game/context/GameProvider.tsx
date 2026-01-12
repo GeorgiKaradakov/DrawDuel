@@ -44,6 +44,12 @@ function reducer(state: GameState, action: Action): GameState {
         choosingWord: false,
         waitForWord: false,
         roundStarted: true,
+        roundResults: {
+          drawerName: "",
+          guesserName: "",
+          drawerScore: 0,
+          guesserScore: 0,
+        },
         roundTime: action.payload.countdown ?? 60,
         chosenWord: action.payload.word,
         maskedWord: action.payload.wordLength

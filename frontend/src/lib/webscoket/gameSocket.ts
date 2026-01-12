@@ -24,3 +24,8 @@ export function sendGuess(guess: string, timeLeft: number, guessCount: number) {
 export function sentRoundTimeOut(guessCount: number) {
   sendMessage({ type: "timeUpRound", guessCount });
 }
+
+export function sendLeaveGame() {
+  // Function for a player to leave the game
+  sendMessage({ type: "leaveGame" });
+}

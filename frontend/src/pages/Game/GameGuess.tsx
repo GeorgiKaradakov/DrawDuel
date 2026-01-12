@@ -3,7 +3,7 @@ import { useGame } from "./context/useGame";
 import WordDisplay from "@/components/layout/Game/WordDisplay";
 import GameDrawingCanvas from "@/components/layout/Game/GameDrawingCanvas";
 import GameTimer from "@/components/layout/Game/GameTimer";
-import { sentRoundTimeOut } from "@/lib/webscoket/gameSocket";
+import { sendLeaveGame, sentRoundTimeOut } from "@/lib/webscoket/gameSocket";
 import GuessMessageCont from "@/components/layout/Game/GuessMessageCont";
 import { useNavigate } from "react-router";
 import PresentWinner from "@/components/layout/Game/PresentWinner";
@@ -25,12 +25,12 @@ const GameGuess = () => {
         winner={state.endGameStats.winner}
         onPlayAgain={function (): void {
           dispatch({ type: "RESET" });
-          disconnectSocket();
+          sendLeaveGame();
           navigate(`/find-game/${state.endGameStats.playerId}`);
         }}
         onReturnToDashboard={function (): void {
           dispatch({ type: "RESET" });
-          disconnectSocket();
+          sendLeaveGame();
           navigate("/dashboard");
         }}
       />
@@ -43,7 +43,11 @@ const GameGuess = () => {
 
   return (
     <TimerProvider>
-      <WordDisplay word={state.maskedWord || "???"} isMasked />
+      <WordDisplay
+        className="top-20 w-1/4 border-0"
+        word={state.maskedWord || "???"}
+        isMasked
+      />
       <GameDrawingCanvas isDrawer={false} />
       <GameTimer
         countDownSeconds={state.roundTime}
