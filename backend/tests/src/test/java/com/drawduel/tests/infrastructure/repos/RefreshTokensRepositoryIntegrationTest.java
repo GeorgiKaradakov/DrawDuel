@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,17 +26,13 @@ public class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest 
 
   @Autowired private TokensJpaRepository tokensJpaRepository;
   @Autowired private UserJpaRepository userJpaRepository;
+  @Autowired private Environment environment;
 
   private RefreshTokenRepositoryImpl refreshTokenRepository;
   private UUID userId;
 
   @BeforeEach
   void setup() {
-    System.out.println("🔗 Connected DB: " + POSTGRES.getJdbcUrl());
-
-    assertThat(tokensJpaRepository).as("tokensJpaRepository is autowired").isNotNull();
-    assertThat(userJpaRepository).as("userJpaRepository is autowired").isNotNull();
-
     UserSessionToJpaEntity mapper = Mappers.getMapper(UserSessionToJpaEntity.class);
     refreshTokenRepository =
         new RefreshTokenRepositoryImpl(tokensJpaRepository, userJpaRepository, mapper);
@@ -54,6 +51,7 @@ public class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest 
   @Test
   @Transactional
   void shouldSaveAndFindByRefreshToken() {
+
     String refreshToken = "refresh-token-123";
 
     UserSession session =

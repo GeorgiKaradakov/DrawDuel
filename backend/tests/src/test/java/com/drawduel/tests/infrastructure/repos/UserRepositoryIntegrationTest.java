@@ -22,8 +22,6 @@ public class UserRepositoryIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
   void setup() {
-    System.out.println("🔗 Connected DB: " + POSTGRES.getJdbcUrl());
-
     userRepository = new UserRepositoryImpl(userJpaRepository);
   }
 
