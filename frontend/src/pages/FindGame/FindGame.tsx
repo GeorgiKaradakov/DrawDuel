@@ -8,7 +8,6 @@ import {
   removeSocketListener,
 } from "@/lib/webscoket/socketManager";
 import type { ServerMessage } from "@/lib/webscoket/types";
-import { Sidebar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
