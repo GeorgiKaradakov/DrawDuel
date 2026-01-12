@@ -1,66 +1,23 @@
-import FindingAnimation from "@/components/layout/FindGame/FindingAnimation";
-import Navbar from "@/components/layout/General/SideBar/Navbar";
 import { Button } from "@/components/ui/button";
-import { searchForGame } from "@/lib/webscoket/gameSocket";
-import {
-  addSocketListener,
-  connectSocket,
-  removeSocketListener,
-} from "@/lib/webscoket/socketManager";
-import type { ServerMessage } from "@/lib/webscoket/types";
+import Navbar from "@/components/layout/General/SideBar/Navbar";
+import FindingAnimation from "@/components/layout/FindGame/FindingAnimation";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
+import { connectSocket } from "@/lib/webscoket/socketManager";
+import { searchForGame } from "@/lib/webscoket/gameSocket";
 
 const FindGame = () => {
-  const [searching, setSearching] = useState(false);
-  const navigate = useNavigate();
   const { userId } = useParams();
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
-    connectSocket(
-      () => console.log("Socket opened for matchmaking"),
-      () => setSearching(false),
-    );
-
-    const handleMessage = (data: ServerMessage) => {
-      if (data.type === "waiting") {
-        setSearching(true);
-      }
-
-      if (data.type === "sendToDraw") {
-        navigate(`/game/${data.gameId}/draw`);
-      }
-
-      if (data.type === "wordChoice" && data.role === "drawer") {
-        console.log("📝 [FindGame] WORD CHOICE RECEIVED");
-
-        navigate(`/game/${data.gameId}/draw`, {
-          state: {
-            words: data.words,
-            wordPickCountDown: data.countdown,
-          },
-        });
-      }
-
-      if (data.type === "sendToGuess") {
-        navigate(`/game/${data.gameId}/guess`);
-      }
-    };
-
-    // 3️⃣ Add listener to the bus
-    addSocketListener(handleMessage);
-
-    // 4️⃣ Cleanup on unmount
-    return () => {
-      removeSocketListener(handleMessage);
-    };
-  }, [navigate]);
+    connectSocket();
+  }, []);
 
   const handleFindGame = () => {
-    if (userId) {
-      searchForGame(userId);
-      setSearching(true);
-    }
+    if (!userId) return;
+    searchForGame(userId);
+    setSearching(true);
   };
 
   return (

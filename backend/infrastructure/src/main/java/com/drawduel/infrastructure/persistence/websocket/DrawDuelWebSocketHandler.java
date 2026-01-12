@@ -80,7 +80,31 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
       }
       case "draw" -> handleDraw(session, message);
       case "guess" -> handleGuess(session, node);
+      case "leaveGame" -> handlePlayerLeave(session);
     }
+  }
+
+  private void handlePlayerLeave(WebSocketSession session) {
+    UUID playerId = sessionPlayers.get(session);
+    if (playerId == null) return;
+
+    waitingPlayers.remove(playerId);
+
+    activeRounds
+        .entrySet()
+        .removeIf(
+            e ->
+                e.getValue().getDrawerId().equals(playerId)
+                    || e.getValue().getGuesserId().equals(playerId));
+
+    activeGames
+        .entrySet()
+        .removeIf(
+            e ->
+                e.getValue().playerAId().equals(playerId)
+                    || e.getValue().playerBId().equals(playerId));
+
+    System.out.println("Player reset for matchmaking: " + playerId);
   }
 
   private void handlePlayerSearch(UUID playerId, WebSocketSession session) throws IOException {
@@ -115,10 +139,10 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
 
     List<String> randomWords = pickRandomWords(3);
 
-    if (roundNumber == 1) {
-      sendToPlayer(drawerId, Map.of("type", "sendToDraw", "gameId", game.id().toString()));
-      sendToPlayer(guesserId, Map.of("type", "sendToGuess", "gameId", game.id().toString()));
-    }
+    // if (roundNumber == 1) {
+    //   sendToPlayer(drawerId, Map.of("type", "sendToDraw", "gameId", game.id().toString()));
+    //   sendToPlayer(guesserId, Map.of("type", "sendToGuess", "gameId", game.id().toString()));
+    // }
 
     sendToPlayer(
         drawerId,
