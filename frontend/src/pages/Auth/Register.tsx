@@ -100,6 +100,7 @@ const Register = () => {
               label="Agree to Terms and Conditions"
               type="checkbox"
               className="w-4/5"
+              data-cy="agreeTerms"
             />
           </div>
 
@@ -109,6 +110,7 @@ const Register = () => {
               className="bg-violet-500 w-4/5 text-2xl text-white font-bold hover:bg-violet-600 hover:cursor-pointer"
               size="lg"
               type="submit"
+              data-cy="register-submit"
             >
               Register
             </Button>
@@ -123,7 +125,7 @@ const Register = () => {
                 type="button"
                 onClick={() => navigate("/auth/login")}
               >
-                Sign up
+                Sign In
               </Button>
             </div>
           </div>

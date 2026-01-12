@@ -7,6 +7,7 @@ import z from "zod";
 import { useEffect } from "react";
 import { deleteAccountApi, getMyProfile, updateProfile } from "./userSettings";
 import { useNavigate } from "react-router";
+import { setAccessToken } from "@/lib/api";
 
 const updateProfileSchema = z.object({
   username: z.string().min(3),
@@ -64,6 +65,8 @@ const UpdateProfile = () => {
 
     try {
       await deleteAccountApi();
+
+      setAccessToken("");
 
       navigate("/auth/login");
     } catch (err) {

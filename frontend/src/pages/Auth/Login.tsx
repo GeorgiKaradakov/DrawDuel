@@ -41,7 +41,7 @@ const Login = () => {
   return (
     <div className="py-8 pb-14 flex flex-col justify-center items-center space-y-12">
       <p className="pt-5 text-neutral-200 font-semibold text-4xl">
-        Register to DrawDuel
+        Login to DrawDuel
       </p>
       <Form {...form}>
         <form
@@ -75,6 +75,7 @@ const Login = () => {
               className="bg-violet-500 w-4/5 text-2xl text-white font-bold hover:bg-violet-600 hover:cursor-pointer"
               size="lg"
               type="submit"
+              data-cy="login-submit"
             >
               Login
             </Button>

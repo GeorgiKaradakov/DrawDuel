@@ -78,7 +78,7 @@ const Dashboard = () => {
             <DashboardCard
               type="number"
               title="Win / Loss Ratio"
-              number={stats.winLossRatio}
+              number={Number(stats.winLossRatio.toFixed(2))}
               percantege
             />
             <DashboardCard

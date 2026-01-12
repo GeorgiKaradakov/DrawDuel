@@ -67,6 +67,7 @@ const Navbar = () => {
           variant="default"
           className="p-2 w-full bg-neutral-600 text-lg text-neutral-50 font-bold hover:bg-red-400"
           onClick={() => logout()}
+          data-cy="logout-submit"
         >
           <span>
             <LogOut />
