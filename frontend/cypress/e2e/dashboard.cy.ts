@@ -5,6 +5,10 @@ describe("Dashboard", () => {
     password: "Password123!",
   };
 
+  before(() => {
+    cy.register(user.username, user.email, user.password);
+  });
+
   beforeEach(() => {
     cy.login(user.email, user.password);
   });
@@ -15,20 +19,3 @@ describe("Dashboard", () => {
     cy.contains("Dashboard");
   });
 });
-
-// it("shows user-specific data", () => {
-//   cy.visit("/dashboard");
-//
-//   // Adjust text selectors to your UI
-//   cy.contains(user.username);
-// });
-
-//                           I do not know how cypress sends cookies and I were not able to fix it
-
-//   it("blocks dashboard when not authenticated", () => {
-//     cy.logout();
-//
-//     cy.visit("/dashboard");
-//     cy.url().should("include", "/auth/login");
-//   });
-// });
