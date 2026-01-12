@@ -84,6 +84,7 @@ function FormInput<T extends FieldValues>({
               <div className="flex justify-start items-center space-x-2">
                 <FormControl>
                   <Checkbox
+                    // data-cy={props["data-cy"]}
                     checked={field.value}
                     onCheckedChange={field.onChange}
                     className={cn(inputClassName, "")}

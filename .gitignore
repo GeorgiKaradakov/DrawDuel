@@ -72,9 +72,9 @@ frontend/.env.*.local
 # ---------------------------
 # Common
 # ---------------------------
-.env
-.env.local
-*.env
+.env*
+*/.env*
+**/.env*
 
 # Ignore coverage reports
 coverage/

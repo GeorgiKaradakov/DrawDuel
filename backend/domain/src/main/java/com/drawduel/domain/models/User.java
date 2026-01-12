@@ -2,14 +2,17 @@ package com.drawduel.domain.models;
 
 import java.time.Instant;
 import java.util.UUID;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class User {
-  private final UUID id;
-  private final String username;
-  private final String email;
-  private final String passHash;
-  private final Instant createdAt;
+  private UUID id;
+  private String username;
+  private String email;
+  private String passHash;
+  private Instant createdAt;
 }

@@ -7,9 +7,9 @@ import com.drawduel.domain.models.UserSession;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TokensService {
   private final JwtService jwtService;
   private final SaveRefreshTokenUseCasePort saveRefreshTokenUseCase;

@@ -44,3 +44,12 @@ export const register = async (
     throw new Error(message);
   }
 };
+
+export const logout = async () => {
+  await api.post("/api/auth/logout");
+
+  // Clear access token client-side
+  setAccessToken("");
+
+  window.location.href = "/auth/login";
+};
