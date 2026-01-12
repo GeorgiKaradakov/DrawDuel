@@ -42,6 +42,11 @@ public class UserRepositoryImpl implements UserRepository {
     return userJpaRepository.findByEmail(email).map(this::ToDomain);
   }
 
+  @Override
+  public void deleteById(UUID id) {
+    userJpaRepository.deleteById(id);
+  }
+
   private User ToDomain(JpaUserEntity entity) {
     return new User(
         entity.getId(),

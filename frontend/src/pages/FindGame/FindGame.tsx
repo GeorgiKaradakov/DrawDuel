@@ -1,4 +1,5 @@
 import FindingAnimation from "@/components/layout/FindGame/FindingAnimation";
+import Navbar from "@/components/layout/General/SideBar/Navbar";
 import { Button } from "@/components/ui/button";
 import { searchForGame } from "@/lib/webscoket/gameSocket";
 import {
@@ -7,6 +8,7 @@ import {
   removeSocketListener,
 } from "@/lib/webscoket/socketManager";
 import type { ServerMessage } from "@/lib/webscoket/types";
+import { Sidebar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
@@ -64,10 +66,13 @@ const FindGame = () => {
 
   return (
     <>
-      <div className="w-screen h-screen flex justify-center items-center bg-neutral-600">
-        <Button className="w-1/5 h-1/9 text-4xl" onClick={handleFindGame}>
-          Find Game
-        </Button>
+      <div className="w-screen h-screen flex bg-neutral-700">
+        <Navbar />
+        <div className="w-full h-full flex justify-center items-center">
+          <Button className="w-1/5 h-1/9 text-4xl" onClick={handleFindGame}>
+            Find Game
+          </Button>
+        </div>
       </div>
       {searching && <FindingAnimation />}
     </>

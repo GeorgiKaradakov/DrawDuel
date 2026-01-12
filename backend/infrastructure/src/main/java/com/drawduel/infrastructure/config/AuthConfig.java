@@ -5,6 +5,7 @@ import com.drawduel.application.mapper.UserSessionDomainToDtoMapper;
 import com.drawduel.application.ports.GetRefreshTokenUseCasePort;
 import com.drawduel.application.ports.GetUserByIdUseCasePort;
 import com.drawduel.application.ports.LoginUseCasePort;
+import com.drawduel.application.ports.LogoutUseCasePort;
 import com.drawduel.application.ports.RegisterUseCasePort;
 import com.drawduel.application.ports.RevokeRefreshTokenUseCasePort;
 import com.drawduel.application.ports.SaveRefreshTokenUseCasePort;
@@ -13,6 +14,7 @@ import com.drawduel.application.services.TokensService;
 import com.drawduel.application.usecases.GetRefreshTokenUseCase;
 import com.drawduel.application.usecases.GetUserByIdUseCase;
 import com.drawduel.application.usecases.LoginUseCase;
+import com.drawduel.application.usecases.LogoutUseCase;
 import com.drawduel.application.usecases.RegisterUseCase;
 import com.drawduel.application.usecases.RevokeRefreshTokenUseCase;
 import com.drawduel.application.usecases.SaveRefreshTokenUseCase;
@@ -62,6 +64,11 @@ public class AuthConfig {
   public LoginUseCasePort loginUseCase(
       UserRepositoryImpl userRepo, TokensService tokensService, BCryptPasswordHasher hasher) {
     return new LoginUseCase(userRepo, tokensService, hasher);
+  }
+
+  @Bean
+  LogoutUseCasePort logoutUseCase(RefreshTokenRepository refreshTokenRepository) {
+    return new LogoutUseCase(refreshTokenRepository);
   }
 
   @Bean

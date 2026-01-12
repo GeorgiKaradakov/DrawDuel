@@ -7,6 +7,7 @@ import com.drawduel.application.dtos.UserSessionDto;
 import com.drawduel.application.ports.GetRefreshTokenUseCasePort;
 import com.drawduel.application.ports.GetUserByIdUseCasePort;
 import com.drawduel.application.ports.LoginUseCasePort;
+import com.drawduel.application.ports.LogoutUseCasePort;
 import com.drawduel.application.ports.RegisterUseCasePort;
 import com.drawduel.application.ports.RevokeRefreshTokenUseCasePort;
 import com.drawduel.application.services.TokensService;
@@ -39,6 +40,7 @@ public class AuthController {
   private final RevokeRefreshTokenUseCasePort revokeRefreshTokenUseCase;
   private final GetRefreshTokenUseCasePort getRefreshTokenUseCase;
   private final TokensService tokensService;
+  private final LogoutUseCasePort logoutUseCase;
 
   @PostMapping("/register")
   public ResponseEntity<AccessTokenDto> register(
@@ -135,6 +137,17 @@ public class AuthController {
     return ResponseEntity.ok(new AccessTokenDto(tokens[0]));
   }
 
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+    String refreshToken = extractRefreshToken(request);
+
+    logoutUseCase.handle(new LogoutUseCasePort.Query(refreshToken));
+
+    deleteRefreshTokenCookie(response);
+
+    return ResponseEntity.noContent().build();
+  }
+
   private String extractCookie(HttpServletRequest req) {
     if (req.getCookies() == null) return null;
 
@@ -159,5 +172,25 @@ public class AuthController {
     }
 
     return request.getRemoteAddr();
+  }
+
+  private String extractRefreshToken(HttpServletRequest request) {
+    if (request.getCookies() == null) return null;
+
+    for (Cookie cookie : request.getCookies()) {
+      if ("refreshToken".equals(cookie.getName())) {
+        return cookie.getValue();
+      }
+    }
+    return null;
+  }
+
+  private void deleteRefreshTokenCookie(HttpServletResponse response) {
+    Cookie cookie = new Cookie("refreshToken", "");
+    cookie.setHttpOnly(true);
+    cookie.setSecure(true); // keep consistent with prod
+    cookie.setPath("/");
+    cookie.setMaxAge(0);
+    response.addCookie(cookie);
   }
 }

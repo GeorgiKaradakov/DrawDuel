@@ -3,3 +3,7 @@
 
 # Ignore Gradle build output directory
 build
+
+*/.env*
+*/.env.docker
+*/.env.local

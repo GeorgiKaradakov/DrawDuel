@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import Navbar from "@/components/layout/General/Navbar";
+import Navbar from "@/components/layout/General/SideBar/Navbar";
 import DashboardCard from "@/components/layout/Dashboard/components/DashboardCard";
 import { getDashboardData } from "./dashboard";
 import type { DashboardResponse } from "@/lib/globalTypes";
@@ -45,7 +45,7 @@ const Dashboard = () => {
 
   if (!data) {
     return (
-      <div className="w-screen h-screen flex justify-center items-center text-neutral-400 text-xl">
+      <div className="w-screen h-screen flex justify-center items-center bg-neutral-700 text-neutral-400 text-xl">
         Loading dashboard...
       </div>
     );
@@ -59,7 +59,7 @@ const Dashboard = () => {
 
       <div className="w-full h-full grid grid-cols-4 grid-rows-5 p-4">
         {/* TOP SECTION */}
-        <div className="col-span-4 row-span-3 flex gap-4">
+        <div className="col-span-4 row-span-3 flex justify-center items-center gap-x-6">
           <DashboardCard
             type="table"
             title="Leaderboard"
