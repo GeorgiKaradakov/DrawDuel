@@ -1,77 +1,57 @@
-import type { ServerMessage } from "./types";
+import { getAccessToken } from "../api";
 
 let socket: WebSocket | null = null;
-const listeners: ((data: ServerMessage) => void)[] = [];
+const listeners: ((data: any) => void)[] = [];
 
-export function connectSocket(
-  onOpen?: () => void,
-  onClose?: () => void,
-): WebSocket {
+export function connectSocket(onOpen?: () => void, onClose?: () => void) {
   if (socket && socket.readyState === WebSocket.OPEN) {
     return socket;
   }
 
-  if (socket && socket.readyState === WebSocket.CONNECTING) {
-    return socket;
-  }
-
-  const token = localStorage.getItem("accessToken");
-  socket = new WebSocket(`ws://localhost:8080/ws/draw?token=${token}`);
+  const token = getAccessToken();
+  socket = new WebSocket(`ws://localhost:8080/ws/drawduel?token=${token}`);
 
   socket.onopen = () => {
+    console.log("✅ WS connected");
     onOpen?.();
+  };
+
+  socket.onclose = () => {
+    console.log("❌ WS disconnected");
+    onClose?.();
+    socket = null;
   };
 
   socket.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
-      listeners.forEach((listener) => listener(data));
+      listeners.forEach((l) => l(data));
     } catch (e) {
       console.error("Bad WS message:", event.data);
     }
   };
 
-  socket.onclose = () => {
-    console.log("Socket closed");
-    onClose?.();
-    socket = null;
-  };
-
-  socket.onerror = (err) => {
-    console.error("WebSocket error:", err);
-  };
-
   return socket;
 }
 
-export function sendMessage(data: any) {
-  if (socket?.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify(data));
-  } else {
-    console.warn("WebSocket not ready — message dropped:", data);
+export function sendMessage(payload: any) {
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    console.warn("WebSocket not ready — message dropped:", payload);
+    return;
   }
+  socket.send(JSON.stringify(payload));
 }
 
-export function addSocketListener(fn: (data: ServerMessage) => void) {
-  if (!listeners.includes(fn)) listeners.push(fn);
+export function addSocketListener(fn: (data: any) => void) {
+  listeners.push(fn);
 }
 
-export function removeSocketListener(fn: (data: ServerMessage) => void) {
+export function removeSocketListener(fn: (data: any) => void) {
   const idx = listeners.indexOf(fn);
-  if (idx !== -1) listeners.splice(idx, 1);
+  if (idx >= 0) listeners.splice(idx, 1);
 }
 
 export function disconnectSocket() {
-  if (socket) {
-    socket.close();
-    socket = null;
-  }
-}
-
-export function getSocket(): WebSocket | null {
-  return socket;
-}
-
-export function isSocketConnected(): boolean {
-  return socket?.readyState === WebSocket.OPEN;
+  socket?.close();
+  socket = null;
 }

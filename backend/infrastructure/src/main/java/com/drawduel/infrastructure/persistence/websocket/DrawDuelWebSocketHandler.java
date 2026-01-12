@@ -115,10 +115,10 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
 
     List<String> randomWords = pickRandomWords(3);
 
-    if (roundNumber == 1) {
-      sendToPlayer(drawerId, Map.of("type", "sendToDraw", "gameId", game.id().toString()));
-      sendToPlayer(guesserId, Map.of("type", "sendToGuess", "gameId", game.id().toString()));
-    }
+    // if (roundNumber == 1) {
+    //   sendToPlayer(drawerId, Map.of("type", "sendToDraw", "gameId", game.id().toString()));
+    //   sendToPlayer(guesserId, Map.of("type", "sendToGuess", "gameId", game.id().toString()));
+    // }
 
     sendToPlayer(
         drawerId,

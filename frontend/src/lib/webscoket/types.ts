@@ -12,6 +12,7 @@ export interface ServerMessage {
   role?: "drawer" | "guesser";
   words?: string[];
   countdown?: number;
+  roundNumber?: number;
 }
 
 export interface GameDrawingCanvasProps {

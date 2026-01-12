@@ -4,6 +4,7 @@ import Login from "@/pages/Auth/Login";
 import Register from "@/pages/Auth/Register";
 import Dashboard from "@/pages/Dashboard/Dashboard";
 import FindGame from "@/pages/FindGame/FindGame";
+import GameProvider from "@/pages/Game/context/GameProvider";
 import GameDraw from "@/pages/Game/GameDraw";
 import GameGuess from "@/pages/Game/GameGuess";
 import DeviceManagement from "@/pages/UserSettings/DeviceManagement";
@@ -13,6 +14,7 @@ import { createBrowserRouter } from "react-router";
 export const router = createBrowserRouter([
   {
     path: "/",
+    Component: GameProvider,
     children: [
       {
         path: "auth",
