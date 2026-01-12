@@ -1,5 +1,4 @@
 import type { ServerMessage } from "@/lib/webscoket/types";
-import { createContext } from "react";
 
 export interface GameState {
   role?: "drawer" | "guesser";

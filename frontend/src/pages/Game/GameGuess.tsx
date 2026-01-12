@@ -9,7 +9,6 @@ import { useNavigate } from "react-router";
 import PresentWinner from "@/components/layout/Game/PresentWinner";
 import { TimerProvider } from "@/context/TimerContext";
 import PresentScores from "@/components/layout/Game/PresentScores";
-import { disconnectSocket } from "@/lib/webscoket/socketManager";
 
 const GameGuess = () => {
   const { state, dispatch } = useGame();

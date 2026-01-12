@@ -8,7 +8,6 @@ import { useNavigate } from "react-router";
 import { TimerProvider } from "@/context/TimerContext";
 import GameDrawingCanvas from "@/components/layout/Game/GameDrawingCanvas";
 import { useGame } from "./context/useGame";
-import { disconnectSocket } from "@/lib/webscoket/socketManager";
 import { sendLeaveGame } from "@/lib/webscoket/gameSocket";
 
 const GameDraw = () => {
