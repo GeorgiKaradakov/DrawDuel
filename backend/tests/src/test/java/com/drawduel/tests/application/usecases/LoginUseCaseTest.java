@@ -33,7 +33,7 @@ class LoginUseCaseTest {
   @Test
   void shouldLoginSuccessfullyWithEmail() {
     User user =
-        new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hashed123", Instant.now());
+        new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hashed123", Instant.now(), null);
     when(userRepo.findByEmail("guts@drawduel.com")).thenReturn(Optional.of(user));
     when(hasher.matches("password123", "hashed123")).thenReturn(true);
     when(tokensService.generateTokens(user, "127.0.0.1", "Chrome", "Earth"))
@@ -53,7 +53,8 @@ class LoginUseCaseTest {
 
   @Test
   void shouldLoginSuccessfullyWithUsername() {
-    User user = new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hash", Instant.now());
+    User user =
+        new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hash", Instant.now(), null);
     when(userRepo.findByEmail("guts")).thenReturn(Optional.empty());
     when(userRepo.findByUsername("guts")).thenReturn(Optional.of(user));
     when(hasher.matches("123", "hash")).thenReturn(true);
@@ -83,7 +84,8 @@ class LoginUseCaseTest {
 
   @Test
   void shouldThrowIfPasswordDoesNotMatch() {
-    User user = new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hash", Instant.now());
+    User user =
+        new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hash", Instant.now(), null);
     when(userRepo.findByEmail("guts@drawduel.com")).thenReturn(Optional.of(user));
     when(hasher.matches("wrong", "hash")).thenReturn(false);
 

@@ -79,6 +79,8 @@ public class AuthController {
             new LoginUseCase.Query(
                 req.getIdentifier(), req.getPassword(), Ip, userAgent, location));
 
+    System.out.println("does it come here");
+
     ResponseCookie cookie =
         ResponseCookie.from("refreshToken", tokens.refreshToken())
             .httpOnly(true)

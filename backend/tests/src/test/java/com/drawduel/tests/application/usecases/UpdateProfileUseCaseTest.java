@@ -27,7 +27,7 @@ class UpdateProfileUseCaseTest {
     useCase = new UpdateProfileUseCase(userRepository);
 
     userId = UUID.randomUUID();
-    user = new User(userId, "oldUsername", "old@email.com", "hash", Instant.now());
+    user = new User(userId, "oldUsername", "old@email.com", "hash", Instant.now(), null);
   }
 
   @Test
@@ -47,7 +47,7 @@ class UpdateProfileUseCaseTest {
   void throwsIfUsernameTaken() {
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
     when(userRepository.findByUsername("taken"))
-        .thenReturn(Optional.of(new User(UUID.randomUUID(), "user", "email", "hash", null)));
+        .thenReturn(Optional.of(new User(UUID.randomUUID(), "user", "email", "hash", null, null)));
 
     assertThatThrownBy(
             () ->
@@ -62,7 +62,7 @@ class UpdateProfileUseCaseTest {
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
     when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
     when(userRepository.findByEmail("taken@email.com"))
-        .thenReturn(Optional.of(new User(UUID.randomUUID(), "user", "email", "hash", null)));
+        .thenReturn(Optional.of(new User(UUID.randomUUID(), "user", "email", "hash", null, null)));
 
     assertThatThrownBy(
             () ->

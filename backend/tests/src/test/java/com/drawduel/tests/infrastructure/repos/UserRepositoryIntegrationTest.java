@@ -27,7 +27,8 @@ public class UserRepositoryIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void shouldSaveAndRetrieveUserById() {
-    User user = new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hash123", Instant.now());
+    User user =
+        new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hash123", Instant.now(), null);
 
     userRepository.save(user);
 
@@ -41,7 +42,8 @@ public class UserRepositoryIntegrationTest extends BaseIntegrationTest {
   @Test
   void shouldFindUserByUsernameAndEmail() {
     User user =
-        new User(UUID.randomUUID(), "griffith", "griffith@falcons.com", "hash", Instant.now());
+        new User(
+            UUID.randomUUID(), "griffith", "griffith@falcons.com", "hash", Instant.now(), null);
     userRepository.save(user);
 
     var byUsername = userRepository.findByUsername("griffith");

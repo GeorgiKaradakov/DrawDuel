@@ -112,7 +112,8 @@ class AuthControllerTest extends BaseIntegrationTest {
             Instant.now(),
             Instant.now().plusSeconds(3600));
 
-    var user = new UserDto(session.getUserId(), "testuser", "test@example.com", Instant.now());
+    var user =
+        new UserDto(session.getUserId(), "testuser", "test@example.com", Instant.now(), null);
 
     when(getRefreshTokenUseCase.handle(any()))
         .thenReturn(new GetRefreshTokenUseCasePort.Result(session));

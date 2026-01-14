@@ -1,55 +1,57 @@
 import { setAccessToken } from "@/lib/api";
 import { api } from "@/lib/axios";
 
-export const login = async (identifier: string, pass: string) => {
-  try {
-    const response = await api.post("/api/auth/login", {
-      identifier,
-      password: pass,
-    });
+export const authApi = () => {
+  const apiLogin = async (identifier: string, pass: string) => {
+    try {
+      const response = await api.post("/api/auth/login", {
+        identifier,
+        password: pass,
+      });
 
-    const { accessToken } = response.data;
-    setAccessToken(accessToken);
-    return accessToken;
-  } catch (error: any) {
-    const message = error.response?.data?.message || "Login failed";
-    throw new Error(message);
-  }
-};
+      console.log(response);
 
-export const register = async (
-  username: string,
-  email: string,
-  pass: string,
-  passRepeat: string,
-) => {
-  try {
-    const response = await api.post("/api/auth/register", {
-      username,
-      email,
-      pass: pass,
-      repeatPass: passRepeat,
-    });
-
-    const { accessToken } = response.data;
-    setAccessToken(accessToken);
-    return accessToken;
-  } catch (error: any) {
-    if (error.response?.data?.errors) {
-      throw error.response.data.errors; // { email: "...", username: "..." }
+      const { accessToken } = response.data;
+      setAccessToken(accessToken);
+      return accessToken;
+    } catch (error: any) {
+      const message = error.response?.data || "Login failed";
+      throw new Error(message);
     }
+  };
 
-    const message =
-      error.response?.data || "Registration failed. Please try again.";
-    throw new Error(message);
-  }
-};
+  const apiRegister = async (
+    username: string,
+    email: string,
+    pass: string,
+    passRepeat: string,
+  ) => {
+    try {
+      const response = await api.post("/api/auth/register", {
+        username,
+        email,
+        pass: pass,
+        repeatPass: passRepeat,
+      });
 
-export const logout = async () => {
-  await api.post("/api/auth/logout");
+      const { accessToken } = response.data;
+      setAccessToken(accessToken);
+      return accessToken;
+    } catch (error: any) {
+      if (error.response?.data?.errors) {
+        throw error.response.data.errors; // { email: "...", username: "..." }
+      }
 
-  // Clear access token client-side
-  setAccessToken("");
+      const message =
+        error.response?.data || "Registration failed. Please try again.";
+      throw new Error(message);
+    }
+  };
 
-  window.location.href = "/auth/login";
+  const apiLogout = async () => {
+    await api.post("/api/auth/logout");
+    setAccessToken("");
+  };
+
+  return { apiLogin, apiRegister, apiLogout };
 };

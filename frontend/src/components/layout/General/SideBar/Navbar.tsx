@@ -7,9 +7,10 @@ import Section from "./Section";
 import SectionContent from "./SectionContent";
 import { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
-import { logout } from "@/pages/Auth/auth";
+import { useAuth } from "@/context/authProvider/useAuth";
 
 const Navbar = () => {
+  const { logout } = useAuth();
   const location = useLocation();
 
   const [currentSectionItem, setCurrentSectionItem] =

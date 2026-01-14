@@ -14,6 +14,7 @@ public class RegisterRequestDto {
   private String username;
   private String pass;
   private String repeatPass;
+  private byte[] profileImageBase64;
 
   private String ipAddress;
   private String userAgent;

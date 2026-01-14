@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 import FormDescrriptionToolTip from "./FormDescrriptionToolTip";
+import { Button } from "@/components/ui/button";
 
 function FormInput<T extends FieldValues>({
   formControl,
@@ -53,12 +54,19 @@ function FormInput<T extends FieldValues>({
                         )}
                         {...field}
                       />
-                      <div
-                        className="absolute right-1 top-1/2 -translate-1/2 hover:cursor-pointer hover:scale-110 select-none"
+                      <Button
+                        type="button"
+                        variant={"default"}
+                        size={"icon"}
+                        className="absolute -right-1 top-1/2 -translate-1/2 h-full bg-transparent hover:cursor-pointer hover:scale-110 hover:bg-transparent select-none"
                         onClick={() => setShowPass((p) => !p)}
                       >
-                        {showPass ? <EyeOff /> : <Eye />}
-                      </div>
+                        {showPass ? (
+                          <EyeOff className="size-7" />
+                        ) : (
+                          <Eye className="size-7" />
+                        )}
+                      </Button>
                     </>
                   </FormDescrriptionToolTip>
                 </div>

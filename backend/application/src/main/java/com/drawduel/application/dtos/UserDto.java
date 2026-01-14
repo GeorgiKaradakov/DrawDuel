@@ -12,4 +12,5 @@ public class UserDto {
   private String username;
   private String email;
   private Instant createdAt;
+  private String profileImageUrl;
 }

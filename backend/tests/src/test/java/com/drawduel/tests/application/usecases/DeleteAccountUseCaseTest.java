@@ -28,7 +28,7 @@ class DeleteAccountUseCaseTest {
     UUID userId = UUID.randomUUID();
 
     when(userRepository.findById(userId))
-        .thenReturn(Optional.of(new User(UUID.randomUUID(), "user", "email", "hash", null)));
+        .thenReturn(Optional.of(new User(UUID.randomUUID(), "user", "email", "hash", null, null)));
 
     useCase.handle(new DeleteAccountUseCasePort.Query(userId));
 

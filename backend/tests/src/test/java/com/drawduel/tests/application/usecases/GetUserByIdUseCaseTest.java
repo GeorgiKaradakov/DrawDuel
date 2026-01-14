@@ -29,12 +29,12 @@ class GetUserByIdUseCaseTest {
   @Test
   void shouldReturnUserDtoWhenUserExists() {
     UUID id = UUID.randomUUID();
-    User user = new User(id, "guts", "guts@drawduel.com", "hash", Instant.now());
+    User user = new User(id, "guts", "guts@drawduel.com", "hash", Instant.now(), null);
     when(userRepo.findById(id)).thenReturn(Optional.of(user));
     when(mapper.toUserDto(user))
         .thenReturn(
             new com.drawduel.application.dtos.UserDto(
-                id, "guts", "guts@drawduel.com", Instant.now()));
+                id, "guts", "guts@drawduel.com", Instant.now(), null));
 
     var result = useCase.handle(new GetUserByIdUseCase.Query(id));
 

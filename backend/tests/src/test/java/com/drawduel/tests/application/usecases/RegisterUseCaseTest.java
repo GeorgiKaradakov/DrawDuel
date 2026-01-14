@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.drawduel.application.dtos.RegisterRequestDto;
+import com.drawduel.application.ports.ImageStorageSevicePort;
 import com.drawduel.application.ports.RegisterUseCasePort;
 import com.drawduel.application.services.TokensService;
 import com.drawduel.application.usecases.RegisterUseCase;
@@ -20,20 +21,22 @@ class RegisterUseCaseTest {
   private PasswordHasher hasher;
   private TokensService tokensService;
   private RegisterUseCasePort useCase;
+  private ImageStorageSevicePort imageStorage;
 
   @BeforeEach
   void setup() {
     userRepo = mock(UserRepository.class);
     hasher = mock(PasswordHasher.class);
     tokensService = mock(TokensService.class);
-    useCase = new RegisterUseCase(userRepo, hasher, tokensService);
+    imageStorage = mock(ImageStorageSevicePort.class);
+    useCase = new RegisterUseCase(userRepo, hasher, tokensService, imageStorage);
   }
 
   @Test
   void shouldRegisterUserSuccessfully() {
     RegisterRequestDto req =
         new RegisterRequestDto(
-            "guts", "guts@drawduel.com", "123", "123", "127.0.0.1", "Chrome", "Earth");
+            "guts", "guts@drawduel.com", "123", "123", null, "127.0.0.1", "Chrome", "Earth");
 
     when(userRepo.findByEmail("guts@drawduel.com")).thenReturn(Optional.empty());
     when(userRepo.findByUsername("guts")).thenReturn(Optional.empty());

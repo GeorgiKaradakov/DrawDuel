@@ -1,5 +1,4 @@
 import GuesserWaitForWordAnimation from "@/components/layout/Game/GuesserWaitForWordAnimation";
-import { useGame } from "./context/useGame";
 import WordDisplay from "@/components/layout/Game/WordDisplay";
 import GameDrawingCanvas from "@/components/layout/Game/GameDrawingCanvas";
 import GameTimer from "@/components/layout/Game/GameTimer";
@@ -9,6 +8,7 @@ import { useNavigate } from "react-router";
 import PresentWinner from "@/components/layout/Game/PresentWinner";
 import { TimerProvider } from "@/context/TimerContext";
 import PresentScores from "@/components/layout/Game/PresentScores";
+import { useGame } from "@/context/gameContextProvider/useGame";
 
 const GameGuess = () => {
   const { state, dispatch } = useGame();
