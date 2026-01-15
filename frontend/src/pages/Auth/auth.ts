@@ -1,5 +1,5 @@
 import { setAccessToken } from "@/lib/api";
-import { api } from "@/lib/axios";
+import { api, apiWithImage } from "@/lib/axios";
 
 export const authApi = () => {
   const apiLogin = async (identifier: string, pass: string) => {
@@ -25,14 +25,21 @@ export const authApi = () => {
     email: string,
     pass: string,
     passRepeat: string,
+    profileImage?: File,
   ) => {
     try {
-      const response = await api.post("/api/auth/register", {
-        username,
-        email,
-        pass: pass,
-        repeatPass: passRepeat,
-      });
+      const formData = new FormData();
+
+      formData.append("username", username);
+      formData.append("email", email);
+      formData.append("pass", pass);
+      formData.append("repeatPass", passRepeat);
+
+      if (profileImage) {
+        formData.append("profileImage", profileImage);
+      }
+
+      const response = await apiWithImage.post("/api/auth/register", formData);
 
       const { accessToken } = response.data;
       setAccessToken(accessToken);

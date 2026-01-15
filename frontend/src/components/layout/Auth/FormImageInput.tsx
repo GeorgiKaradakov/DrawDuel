@@ -43,7 +43,12 @@ const FormImageInput = <T extends FieldValues>({
       name={name}
       render={({ field }) => {
         const { getRootProps, getInputProps, isDragActive } = useDropzone({
-          accept: { "image/*": [] },
+          accept: {
+            "image/png": [],
+            "image/jpeg": [],
+            "image/jpg": [],
+            "image/webp": [],
+          },
           multiple: false,
           onDrop: (files) => onDrop(files, field.onChange),
         });
@@ -57,7 +62,7 @@ const FormImageInput = <T extends FieldValues>({
                 {...getRootProps()}
                 className={cn(
                   "flex items-center justify-center",
-                  "h-40 w-full rounded-md border-2 border-dashed",
+                  "h-25 w-full rounded-md border-2 border-dashed",
                   "bg-neutral-800 text-neutral-400 cursor-pointer transition",
                   isDragActive
                     ? "border-primary bg-neutral-700"
@@ -70,11 +75,12 @@ const FormImageInput = <T extends FieldValues>({
                   <img
                     src={preview}
                     alt="Image preview"
-                    className="h-28 w-28 rounded-full object-cover"
+                    className="h-18 w-18 rounded-full object-cover"
                   />
                 ) : (
-                  <p className="text-sm text-center px-4">
-                    Drag & drop an image here, or click to select
+                  <p className="text-md text-center px-4">
+                    {" "}
+                    Drag & drop an image here, or click to select{" "}
                   </p>
                 )}
               </div>

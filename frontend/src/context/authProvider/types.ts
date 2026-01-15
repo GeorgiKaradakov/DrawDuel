@@ -13,6 +13,7 @@ export type AuthContextType = {
     email: string,
     password: string,
     passsRepeat: string,
+    profileImage?: File,
   ) => Promise<void>;
   logout: () => void;
 };

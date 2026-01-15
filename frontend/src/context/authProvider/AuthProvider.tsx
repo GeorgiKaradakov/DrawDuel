@@ -49,8 +49,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     email: string,
     password: string,
     passwordRepeat: string,
+    profileImageBase64?: File,
   ) => {
-    const token = await apiRegister(username, email, password, passwordRepeat);
+    const token = await apiRegister(
+      username,
+      email,
+      password,
+      passwordRepeat,
+      profileImageBase64,
+    );
     decodeAndSetUser(token);
   };
 

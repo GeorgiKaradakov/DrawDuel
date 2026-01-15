@@ -20,27 +20,23 @@ public class CloudinaryStorageServiceImpl implements ImageStorageSevicePort {
     try {
       Map<String, Object> options =
           Map.of(
-              "folder",
-              "profile-images",
-              "public_id",
-              "user_" + userId.toString(),
-              "overwrite",
-              true,
-              "resource_type",
-              "image",
-              "transformation",
-              Map.of("width", 256, "height", 256, "crop", "fill", "gravity", "face"));
+              "folder", "profile-images",
+              "public_id", "user_" + userId,
+              "overwrite", true,
+              "resource_type", "image",
+              "transformation", "c_fill,g_face,w_256,h_256");
 
       Map<?, ?> result = cloudinary.uploader().upload(imageBytes, options);
 
       Object secureUrl = result.get("secure_url");
       if (secureUrl == null) {
-        throw new IllegalStateException("Cloudinary did not return secure_url");
+        throw new IllegalStateException("Cloudinary upload succeeded but secure_url was missing");
       }
 
       return secureUrl.toString();
 
     } catch (Exception e) {
+      e.printStackTrace();
       throw new IllegalStateException("Failed to upload profile image", e);
     }
   }

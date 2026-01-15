@@ -32,7 +32,7 @@ export const registerSchema = z
         "Confirmed password must contain at least one special symbol!",
       ),
 
-    image: z
+    profileImage: z
       .instanceof(File)
       .optional()
       .refine(

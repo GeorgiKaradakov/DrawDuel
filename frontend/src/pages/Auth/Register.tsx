@@ -29,9 +29,9 @@ const Register = () => {
         values.email,
         values.pass,
         values.passRepeat,
+        values.profileImage,
       );
 
-      // ✅ user is immediately authenticated (token + cookie)
       navigate("/dashboard");
     } catch (err: any) {
       const message: string = err.message;
@@ -58,7 +58,7 @@ const Register = () => {
         >
           <FormImageInput
             formControl={form.control}
-            name="image"
+            name="profileImage"
             label="Profile Image (optional):"
             className="w-4/5"
           />

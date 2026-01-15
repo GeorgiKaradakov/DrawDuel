@@ -23,10 +23,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,16 +47,28 @@ public class AuthController {
 
   @PostMapping("/register")
   public ResponseEntity<AccessTokenDto> register(
-      @RequestBody RegisterRequestDto req, HttpServletResponse res, HttpServletRequest request) {
+      @ModelAttribute RegisterRequestDto req,
+      @RequestParam(required = false) MultipartFile profileImage,
+      HttpServletResponse res,
+      HttpServletRequest request) {
     String Ip = extractClientIp(request);
     String userAgent = request.getHeader("User-Agent");
     String location = "unknown";
+    byte[] imageBytes = null;
+
+    if (profileImage != null && !profileImage.isEmpty()) {
+      try {
+        imageBytes = profileImage.getBytes();
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Failed to read profile image", e);
+      }
+    }
 
     req.setIpAddress(Ip);
     req.setUserAgent(userAgent);
     req.setLocation(location);
 
-    var tokens = registerUseCase.handle(new RegisterUseCasePort.Query(req));
+    var tokens = registerUseCase.handle(new RegisterUseCasePort.Query(req, imageBytes));
     ResponseCookie cookie =
         ResponseCookie.from("refreshToken", tokens.response().getRefreshToken())
             .httpOnly(true)

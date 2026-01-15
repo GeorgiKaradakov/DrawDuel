@@ -18,10 +18,15 @@ public class RegisterUseCase implements RegisterUseCasePort {
   private final PasswordHasher hasher;
   private final TokensService tokensService;
   private final ImageStorageSevicePort imageStorage;
+  private final String DEFAULT_PROFILE_IMAGE_URL;
 
   @Override
   public Result handle(Query q) {
     RegisterRequestDto req = q.request();
+    byte[] imageBytes = q.imageBytes();
+
+    System.out.println(
+        imageBytes == null ? "No image provided" : "Image provided, size: " + imageBytes.length);
 
     userRepo
         .findByEmail(req.getEmail())
@@ -43,8 +48,10 @@ public class RegisterUseCase implements RegisterUseCasePort {
 
     UUID userId = UUID.randomUUID();
     String profileImageUrl = null;
-    if (req.getProfileImageBase64() != null) {
-      profileImageUrl = imageStorage.uploadProfileImage(req.getProfileImageBase64(), userId);
+    if (imageBytes != null) {
+      profileImageUrl = imageStorage.uploadProfileImage(imageBytes, userId);
+    } else {
+      profileImageUrl = DEFAULT_PROFILE_IMAGE_URL;
     }
 
     String hash = hasher.hash(req.getPass());

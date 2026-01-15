@@ -5,7 +5,6 @@ spring:
   config:
     - optional:file:.env.local[.properties]
     - optional:file:.env.docker[.properties]
-    - optional:file:.env.storage[.properties]
 
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
@@ -14,10 +13,7 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   cloudinary:
-    cloud-name: ${CLOUDINARY_CLOUD_NAME}
-    api-key: ${CLOUDINARY_API_KEY}
-    api-secret: ${CLOUDINARY_API_SECRET}
-
+    cloudinary-url: ${CLOUDINARY_URL}
   jpa:
     hibernate:
       ddl-auto: update

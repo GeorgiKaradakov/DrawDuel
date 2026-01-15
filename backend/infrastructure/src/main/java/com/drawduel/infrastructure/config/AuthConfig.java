@@ -60,8 +60,10 @@ public class AuthConfig {
       UserRepositoryImpl userRepo,
       BCryptPasswordHasher hasher,
       TokensService tokenService,
-      ImageStorageSevicePort imageStorage) {
-    return new RegisterUseCase(userRepo, hasher, tokenService, imageStorage);
+      ImageStorageSevicePort imageStorage,
+      @Value("${DEFAULT_PROFILE_IMAGE_URL}") String defaultProfileImageUrl) {
+    return new RegisterUseCase(
+        userRepo, hasher, tokenService, imageStorage, defaultProfileImageUrl);
   }
 
   @Bean
