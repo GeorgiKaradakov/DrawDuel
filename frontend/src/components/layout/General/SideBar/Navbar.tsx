@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { getUserIdFromToken } from "@/lib/jwt";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import WebsiteStamp from "../WebsiteStamp";
 import { sectionContents, sections } from "./staticData";
 import Section from "./Section";
@@ -10,6 +10,7 @@ import AccountSection from "./AccountSection";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [currentSectionItem, setCurrentSectionItem] =
     useState<string>("Dashboard");
@@ -31,7 +32,7 @@ const Navbar = () => {
 
       <div className="w-full h-5/7 space-y-8">
         {sections.map(({ id, sectionName }) => (
-          <Section className="space-y-4" key={id} sectionName={sectionName}>
+          <Section className="space-y-2" key={id} sectionName={sectionName}>
             {sectionContents[id].map(({ id: contentId, name, url }) => {
               const token = localStorage.getItem("accessToken"); // stored after login
               const userId = getUserIdFromToken(token || "");
@@ -55,7 +56,9 @@ const Navbar = () => {
                   className={`${isActive ? "bg-indigo-400" : ""}`}
                   key={contentId}
                   name={name}
-                  url={resolvedUrl}
+                  handleOnClick={() => {
+                    navigate(resolvedUrl);
+                  }}
                 />
               );
             })}

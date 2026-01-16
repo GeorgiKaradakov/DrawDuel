@@ -1,9 +1,18 @@
+import { Laptop, ShieldCheck, User, type LucideIcon } from "lucide-react";
+
 export type SectionId = "GamePlay" | "UserSettings" | "Analytics";
+type ProfileSectionId = "accountSettings" | "deviceManagement";
 
 export interface SectionContentItem {
   id: string;
   name: string;
   url: string | ((userId: string) => string);
+}
+
+interface ProfileLinkItems {
+  id: string;
+  name: string;
+  Icon: LucideIcon;
 }
 
 export const sections = [
@@ -23,14 +32,24 @@ export const sectionContents: Record<SectionId, SectionContentItem[]> = {
   ],
   UserSettings: [
     {
-      id: "UpdateProfile",
-      name: "Update Profile",
-      url: (userId: string) => `/user-settings/update-profile/${userId}`,
+      id: "AccountSettings",
+      name: "Account Settings",
+      url: (userId: string) => `/user-settings/account/${userId}`,
     },
-    {
-      id: "DeviceManagement",
-      name: "Device Management",
-      url: (userId: string) => `/user-settings/device-management/${userId}`,
-    },
+  ],
+} as const;
+
+export const profileSections = [
+  { id: "accountSettings" as ProfileSectionId, name: "Account Settings" },
+  { id: "deviceManagement" as ProfileSectionId, name: "Device Management" },
+];
+
+export const profileLinks: Record<ProfileSectionId, ProfileLinkItems[]> = {
+  accountSettings: [
+    { id: "account-settings", name: "Account", Icon: User },
+    { id: "security-settings", name: "Security", Icon: ShieldCheck },
+  ],
+  deviceManagement: [
+    { id: "device-management", name: "Devices", Icon: Laptop },
   ],
 } as const;

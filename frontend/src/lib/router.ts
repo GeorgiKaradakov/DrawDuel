@@ -11,7 +11,7 @@ import FindGame from "@/pages/FindGame/FindGame";
 import GameDraw from "@/pages/Game/GameDraw";
 import GameGuess from "@/pages/Game/GameGuess";
 import DeviceManagement from "@/pages/UserSettings/DeviceManagement";
-import UpdateProfile from "@/pages/UserSettings/UpdateProfile";
+import AccountSettings from "@/pages/UserSettings/AccountSettings";
 
 import { createBrowserRouter } from "react-router";
 
@@ -62,12 +62,8 @@ export const router = createBrowserRouter([
                 Component: SettingsLayout,
                 children: [
                   {
-                    path: "update-profile/:userId",
-                    Component: UpdateProfile,
-                  },
-                  {
-                    path: "device-management/:userId",
-                    Component: DeviceManagement,
+                    path: "account/:userId",
+                    Component: AccountSettings,
                   },
                 ],
               },
