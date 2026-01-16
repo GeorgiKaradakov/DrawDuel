@@ -6,6 +6,7 @@ import com.drawduel.application.dtos.UserDto;
 import com.drawduel.application.dtos.UserSessionDto;
 import com.drawduel.application.ports.GetRefreshTokenUseCasePort;
 import com.drawduel.application.ports.GetUserByIdUseCasePort;
+import com.drawduel.application.ports.GetUserInfoUseCasePort;
 import com.drawduel.application.ports.LoginUseCasePort;
 import com.drawduel.application.ports.LogoutUseCasePort;
 import com.drawduel.application.ports.RegisterUseCasePort;
@@ -15,6 +16,7 @@ import com.drawduel.application.usecases.GetRefreshTokenUseCase;
 import com.drawduel.application.usecases.GetUserByIdUseCase;
 import com.drawduel.application.usecases.LoginUseCase;
 import com.drawduel.application.usecases.RevokeRefreshTokenUseCase;
+import com.drawduel.infrastructure.persistence.security.SecurityUser;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,6 +44,7 @@ public class AuthController {
   private final RegisterUseCasePort registerUseCase;
   private final LoginUseCasePort loginUseCase;
   private final GetUserByIdUseCasePort getUserByIdUseCase;
+  private final GetUserInfoUseCasePort getUserInfoUseCase;
   private final RevokeRefreshTokenUseCasePort revokeRefreshTokenUseCase;
   private final GetRefreshTokenUseCasePort getRefreshTokenUseCase;
   private final TokensService tokensService;
@@ -107,6 +112,25 @@ public class AuthController {
     res.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString());
 
     return ResponseEntity.ok(new AccessTokenDto(tokens.accessToken()));
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<UserDto> getUserInfo(Authentication authentication) {
+    if (authentication == null || !(authentication.getPrincipal() instanceof SecurityUser)) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    SecurityUser principal = (SecurityUser) authentication.getPrincipal();
+
+    UserDto user;
+    try {
+      user =
+          getUserInfoUseCase.handle(new GetUserInfoUseCasePort.Query(principal.getId())).response();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    return ResponseEntity.ok(user);
   }
 
   @PostMapping("/refresh-tokens")

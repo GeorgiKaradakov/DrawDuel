@@ -6,11 +6,9 @@ import { sectionContents, sections } from "./staticData";
 import Section from "./Section";
 import SectionContent from "./SectionContent";
 import { useEffect, useState } from "react";
-import { LogOut } from "lucide-react";
-import { useAuth } from "@/context/authProvider/useAuth";
+import AccountSection from "./AccountSection";
 
 const Navbar = () => {
-  const { logout } = useAuth();
   const location = useLocation();
 
   const [currentSectionItem, setCurrentSectionItem] =
@@ -30,6 +28,7 @@ const Navbar = () => {
         />
         <div className="w-full border-b border-b-neutral-600"></div>
       </div>
+
       <div className="w-full h-5/7 space-y-8">
         {sections.map(({ id, sectionName }) => (
           <Section className="space-y-4" key={id} sectionName={sectionName}>
@@ -64,17 +63,7 @@ const Navbar = () => {
         ))}
       </div>
       <div className="px-3 w-full h-1/7 flex justify-center items-center">
-        <Button
-          variant="default"
-          className="p-2 w-full bg-neutral-600 text-lg text-neutral-50 font-bold hover:bg-red-400"
-          onClick={() => logout()}
-          data-cy="logout-submit"
-        >
-          <span>
-            <LogOut />
-          </span>
-          Log Out
-        </Button>
+        <AccountSection />
       </div>
     </div>
   );

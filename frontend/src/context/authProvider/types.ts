@@ -1,6 +1,8 @@
 export type AuthUser = {
-  sub: string;
-  exp: number;
+  id: string;
+  username: string;
+  email: string;
+  profileImageUrl?: string | null;
 };
 
 export type AuthContextType = {
@@ -16,6 +18,8 @@ export type AuthContextType = {
     profileImage?: File,
   ) => Promise<void>;
   logout: () => void;
+  setUser: (user: AuthUser | null) => void;
+  initAuth: () => Promise<void>;
 };
 
 export type AuthProviderProps = {

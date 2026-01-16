@@ -34,8 +34,6 @@ class JwtServiceTest {
     assertThat(jwtService.isTokenValid(token)).isTrue();
 
     assertThat(jwtService.extractUserId(token)).isEqualTo(userId);
-    assertThat(jwtService.extractUsername(token)).isEqualTo(username);
-    assertThat(jwtService.extractEmail(token)).isEqualTo(email);
   }
 
   @Test

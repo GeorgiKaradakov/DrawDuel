@@ -3,6 +3,7 @@ package com.drawduel.infrastructure.persistence.security;
 import com.drawduel.domain.models.User;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -20,6 +21,10 @@ public class SecurityUser implements UserDetails {
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return Collections.emptyList(); // no roles for now
+  }
+
+  public UUID getId() {
+    return user.getId();
   }
 
   @Override

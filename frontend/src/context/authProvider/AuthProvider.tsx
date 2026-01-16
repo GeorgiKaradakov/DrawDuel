@@ -1,64 +1,44 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { type AuthUser, type AuthProviderProps } from "./types";
-import { jwtDecode } from "jwt-decode";
-import { getAccessToken } from "@/lib/api";
 import { authApi } from "@/pages/Auth/auth";
+import { api } from "@/lib/axios";
 import { AuthContext } from "./AuthContext";
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const { apiLogin, apiRegister, apiLogout } = authApi();
 
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const decodeAndSetUser = useCallback((token: string) => {
-    const decoded = jwtDecode<AuthUser>(token);
-    setUser(decoded);
-  }, []);
-
-  const isTokenValid = (token: string) => {
+  const initAuth = async () => {
+    setLoading(true);
     try {
-      const decoded = jwtDecode<AuthUser>(token);
-      return Date.now() < decoded.exp * 1000;
+      const res = await api.get<AuthUser>("/api/auth/me");
+      console.log(res.data);
+      setUser(res.data);
     } catch {
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    const token = getAccessToken();
-
-    if (token && isTokenValid(token)) {
-      decodeAndSetUser(token);
-    } else {
       setUser(null);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-  }, [decodeAndSetUser]);
-
-  // 🔐 login uses YOUR function
-  const login = async (identifier: string, password: string) => {
-    const token = await apiLogin(identifier, password);
-    decodeAndSetUser(token);
   };
 
-  // 📝 register uses YOUR function (auto-login)
+  const login = async (identifier: string, password: string) => {
+    await apiLogin(identifier, password);
+    const res = await api.get<AuthUser>("/api/auth/me");
+    setUser(res.data);
+  };
+
   const register = async (
     username: string,
     email: string,
     password: string,
     passwordRepeat: string,
-    profileImageBase64?: File,
+    profileImage?: File,
   ) => {
-    const token = await apiRegister(
-      username,
-      email,
-      password,
-      passwordRepeat,
-      profileImageBase64,
-    );
-    decodeAndSetUser(token);
+    await apiRegister(username, email, password, passwordRepeat, profileImage);
+    const res = await api.get<AuthUser>("/api/auth/me");
+    setUser(res.data);
   };
 
   const logout = async () => {
@@ -79,6 +59,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         login,
         register,
         logout,
+        setUser,
+        initAuth,
       }}
     >
       {children}

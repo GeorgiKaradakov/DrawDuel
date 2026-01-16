@@ -9,3 +9,7 @@ export interface SectionContentProps {
   name: string;
   url: string;
 }
+
+export interface AccountSectionProps {
+  className?: string;
+}

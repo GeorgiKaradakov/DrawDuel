@@ -35,19 +35,19 @@ public class TokensService {
     return session.getRefreshToken();
   }
 
-  public String generateAccessToken(UUID userId, String username, String email) {
-    return jwtService.generateToken(userId, username, email);
+  public String generateAccessToken(UUID userId) {
+    return jwtService.generateToken(userId);
   }
 
   public String[] generateTokens(User user, String ipAdress, String userAgent, String location) {
     String refreshToken = generateRefreshToken(user.getId(), ipAdress, userAgent, location);
-    String accessToken = generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
+    String accessToken = generateAccessToken(user.getId());
     return new String[] {accessToken, refreshToken};
   }
 
   public String[] generateTokens(UserDto user, String ipAdress, String userAgent, String location) {
     String refreshToken = generateRefreshToken(user.getId(), ipAdress, userAgent, location);
-    String accessToken = generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
+    String accessToken = generateAccessToken(user.getId());
     return new String[] {accessToken, refreshToken};
   }
 }
