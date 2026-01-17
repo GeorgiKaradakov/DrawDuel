@@ -2,6 +2,7 @@ package com.drawduel.infrastructure.config;
 
 import com.drawduel.application.ports.DeleteAccountUseCasePort;
 import com.drawduel.application.ports.GetProfileUseCasePort;
+import com.drawduel.application.ports.ImageStorageSevicePort;
 import com.drawduel.application.ports.UpdateProfileUseCasePort;
 import com.drawduel.application.usecases.DeleteAccountUseCase;
 import com.drawduel.application.usecases.GetProfileUseCase;
@@ -14,8 +15,9 @@ import org.springframework.context.annotation.Configuration;
 public class UserProfileConfig {
 
   @Bean
-  public UpdateProfileUseCasePort updateProfileUseCase(UserRepository userRepository) {
-    return new UpdateProfileUseCase(userRepository);
+  public UpdateProfileUseCasePort updateProfileUseCase(
+      UserRepository userRepository, ImageStorageSevicePort imageStorageService) {
+    return new UpdateProfileUseCase(userRepository, imageStorageService);
   }
 
   @Bean

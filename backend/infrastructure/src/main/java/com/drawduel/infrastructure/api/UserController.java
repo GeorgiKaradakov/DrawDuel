@@ -29,7 +29,8 @@ public class UserController {
 
     var result =
         updateProfileUseCase.handle(
-            new UpdateProfileUseCasePort.Query(userId, request.getUsername(), request.getEmail()));
+            new UpdateProfileUseCasePort.Query(
+                userId, request.getUsername(), request.getEmail(), null));
 
     return ResponseEntity.ok(result);
   }

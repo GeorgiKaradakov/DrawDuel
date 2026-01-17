@@ -53,7 +53,7 @@ const Navbar = () => {
 
               return (
                 <SectionContent
-                  className={`${isActive ? "bg-indigo-400" : ""}`}
+                  className={`${isActive ? "bg-indigo-500" : ""}`}
                   key={contentId}
                   name={name}
                   handleOnClick={() => {

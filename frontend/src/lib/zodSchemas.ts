@@ -79,3 +79,31 @@ export const loginSchema = z.object({
       "Confirmed password must contain at least one special symbol!",
     ),
 });
+
+export const securitySettingsSchema = z.object({
+  currentPass: z
+    .string()
+    .min(6, "Confirmed password must be atleast 6 characters!")
+    .regex(
+      /[A-Z]/,
+      "Confirmed password must contain at least one uppercase letter!",
+    )
+    .regex(/[0-9]/, "Confirmed password must contain at least one digit!")
+    .regex(
+      /[^A-Za-z0-9]/,
+      "Confirmed password must contain at least one special symbol!",
+    ),
+
+  newPass: z
+    .string()
+    .min(6, "Confirmed password must be atleast 6 characters!")
+    .regex(
+      /[A-Z]/,
+      "Confirmed password must contain at least one uppercase letter!",
+    )
+    .regex(/[0-9]/, "Confirmed password must contain at least one digit!")
+    .regex(
+      /[^A-Za-z0-9]/,
+      "Confirmed password must contain at least one special symbol!",
+    ),
+});
