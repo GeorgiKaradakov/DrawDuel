@@ -1,5 +1,3 @@
-import z from "zod";
-
 export interface UserPropertyProps {
   className?: string;
   title?: string;

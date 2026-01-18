@@ -10,7 +10,6 @@ import Dashboard from "@/pages/Dashboard/Dashboard";
 import FindGame from "@/pages/FindGame/FindGame";
 import GameDraw from "@/pages/Game/GameDraw";
 import GameGuess from "@/pages/Game/GameGuess";
-import DeviceManagement from "@/pages/UserSettings/DeviceManagement";
 import AccountSettings from "@/pages/UserSettings/AccountSettings";
 
 import { createBrowserRouter } from "react-router";

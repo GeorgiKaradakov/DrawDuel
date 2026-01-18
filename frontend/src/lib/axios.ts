@@ -20,6 +20,17 @@ const refreshClient = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+apiWithImage.interceptors.request.use(
+  (config) => {
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
 api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();

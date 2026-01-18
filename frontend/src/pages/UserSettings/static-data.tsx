@@ -12,8 +12,8 @@ export const userProperties = [
 ];
 
 export interface DeviceManagementRow {
-  os: string;
-  browser: string;
+  osName: string;
+  browserName: string;
   location: string;
   status: string;
   action: string;
@@ -21,12 +21,12 @@ export interface DeviceManagementRow {
 
 export const DeviceManagementColumns: Column<DeviceManagementRow>[] = [
   {
-    key: "os",
+    key: "osName",
     label: "Operating System",
     className: "text-md font-semibold text-neutral-200",
   },
   {
-    key: "browser",
+    key: "browserName",
     label: "Browser",
     className: "text-md font-semibold text-neutral-200",
   },
@@ -40,11 +40,11 @@ export const DeviceManagementColumns: Column<DeviceManagementRow>[] = [
     label: "Status",
     className: "text-md font-semibold",
     render: (value) => {
-      const status = String(value);
+      const status = String(value).toLowerCase().replace("_", " ");
 
       const colorMap: Record<string, string> = {
-        Active: "text-emerald-400",
-        "Current Session": "text-sky-400",
+        active: "text-emerald-400",
+        "current session": "text-sky-400",
       };
 
       return (
@@ -57,7 +57,7 @@ export const DeviceManagementColumns: Column<DeviceManagementRow>[] = [
     label: "Action",
     className: "text-md font-semibold text-neutral-200",
     render: (_, row) => {
-      if (row.status !== "Active") {
+      if (!["ACTIVE", "CURRENT_SESSION"].includes(row.status)) {
         return <span className="text-neutral-400">—</span>;
       }
 
@@ -82,7 +82,7 @@ export const DeviceManagementDummyData: DeviceManagementRow[] = [
     browser: "Chrome",
     location: "Netherlands",
     status: "Current Session",
-    action: "—",
+    action: "Revoke",
   },
   {
     os: "Windows 11",

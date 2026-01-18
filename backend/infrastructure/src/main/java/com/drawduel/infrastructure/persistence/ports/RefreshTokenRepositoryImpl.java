@@ -6,6 +6,7 @@ import com.drawduel.infrastructure.mappers.UserSessionToJpaEntity;
 import com.drawduel.infrastructure.persistence.jpa.entities.JpaTokensEntity;
 import com.drawduel.infrastructure.persistence.jpa.repositories.TokensJpaRepository;
 import com.drawduel.infrastructure.persistence.jpa.repositories.UserJpaRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,13 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
               token.setRevoked(true);
               tokensJpaRepository.save(token);
             });
+  }
+
+  @Override
+  public List<UserSession> findActiveSessionsByUserId(UUID userId) {
+    return tokensJpaRepository.findActiveSessionsByUserId(userId).stream()
+        .map(mapper::toDomain)
+        .toList();
   }
 
   @Override

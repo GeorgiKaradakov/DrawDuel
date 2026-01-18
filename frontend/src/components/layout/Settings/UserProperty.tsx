@@ -3,6 +3,11 @@ import type { UserPropertyProps } from "@/pages/UserSettings/types";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
 import { api, apiWithImage } from "@/lib/axios";
+import {
+  updateEmail,
+  updateProfileImage,
+  updateUsername,
+} from "@/pages/UserSettings/server";
 
 const UserProperty = ({
   className,
@@ -21,29 +26,28 @@ const UserProperty = ({
     try {
       setLoading(true);
 
-      const endpoint =
-        title === "Username"
-          ? "/api/user/update-username"
-          : "/api/user/update-email";
+      switch (title) {
+        case "Username":
+          await updateUsername(updatedContent);
+          break;
 
-      await api.patch(endpoint, {
-        value: updatedContent,
-      });
+        case "Email":
+          await updateEmail(updatedContent);
+          break;
+
+        default:
+          break;
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleImageChange = async (file: File) => {
-    const formData = new FormData();
-    formData.append("profileImage", file);
-
-    try {
-      setLoading(true);
-      await apiWithImage.post("/api/user/update-profile-image", formData);
-    } finally {
+    setLoading(true);
+    await updateProfileImage(file).finally(() => {
       setLoading(false);
-    }
+    });
   };
 
   const handleImageRemove = async () => {

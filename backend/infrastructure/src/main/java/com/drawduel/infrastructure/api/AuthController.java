@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import ua_parser.Client;
+import ua_parser.Parser;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,6 +52,8 @@ public class AuthController {
   private final TokensService tokensService;
   private final LogoutUseCasePort logoutUseCase;
 
+  private static final Parser parser = new Parser();
+
   @PostMapping("/register")
   public ResponseEntity<AccessTokenDto> register(
       @ModelAttribute RegisterRequestDto req,
@@ -62,6 +66,9 @@ public class AuthController {
     String osName = System.getProperty("os.name");
     byte[] imageBytes = null;
 
+    Client client = parser.parse(userAgent);
+    String browserName = client.userAgent.family;
+
     if (profileImage != null && !profileImage.isEmpty()) {
       try {
         imageBytes = profileImage.getBytes();
@@ -71,7 +78,7 @@ public class AuthController {
     }
 
     req.setIpAddress(Ip);
-    req.setUserAgent(userAgent);
+    req.setUserAgent(browserName);
     req.setLocation(location);
     req.setOsName(osName);
 
@@ -97,10 +104,13 @@ public class AuthController {
     String location = "unknown";
     String osName = System.getProperty("os.name");
 
+    Client client = parser.parse(userAgent);
+    String browserName = client.userAgent.family;
+
     LoginUseCase.Result tokens =
         loginUseCase.handle(
             new LoginUseCase.Query(
-                req.getIdentifier(), req.getPassword(), Ip, userAgent, location, osName));
+                req.getIdentifier(), req.getPassword(), Ip, browserName, location, osName));
 
     System.out.println("does it come here");
 
@@ -237,7 +247,7 @@ public class AuthController {
   private void deleteRefreshTokenCookie(HttpServletResponse response) {
     Cookie cookie = new Cookie("refreshToken", "");
     cookie.setHttpOnly(true);
-    cookie.setSecure(true); // keep consistent with prod
+    cookie.setSecure(true);
     cookie.setPath("/");
     cookie.setMaxAge(0);
     response.addCookie(cookie);

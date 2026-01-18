@@ -5,6 +5,7 @@ import { securitySettingsSchema } from "@/lib/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type z from "zod";
+import { updatePassword } from "./server";
 
 const SecuritySettings = () => {
   const form = useForm<z.infer<typeof securitySettingsSchema>>({
@@ -16,7 +17,12 @@ const SecuritySettings = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof securitySettingsSchema>) => {
-    console.log(values);
+    await updatePassword(values.currentPass, values.newPass).catch((error) => {
+      const errorMsg: string = error.response?.data;
+      if (errorMsg.includes("password")) {
+        form.setError("currentPass", { message: errorMsg });
+      }
+    });
   };
 
   return (

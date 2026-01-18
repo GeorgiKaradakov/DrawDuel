@@ -14,7 +14,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     setLoading(true);
     try {
       const res = await api.get<AuthUser>("/api/auth/me");
-      console.log(res.data);
       setUser(res.data);
     } catch {
       setUser(null);
@@ -49,6 +48,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       window.location.href = "/auth/login";
     }
   };
+
+  // useEffect(() => {
+  //   initAuth();
+  // }, []);
 
   return (
     <AuthContext.Provider

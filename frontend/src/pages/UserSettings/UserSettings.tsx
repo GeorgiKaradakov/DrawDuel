@@ -1,6 +1,9 @@
 import UserProperty from "@/components/layout/Settings/UserProperty";
 import { userProperties } from "./static-data.tsx";
 import { useAuth } from "@/context/authProvider/useAuth";
+import { Button } from "@/components/ui/button.tsx";
+import { deleteAccount } from "./server.ts";
+import { setAccessToken } from "@/lib/api.ts";
 
 const UserSettings = () => {
   const { user } = useAuth();
@@ -39,6 +42,19 @@ const UserSettings = () => {
           ),
         )}
       </div>
+      <section className="-mt-5 w-full flex justify-end items-center">
+        <Button
+          variant="destructive"
+          className="text-xl text-neutral-50 font-bold"
+          onClick={async () => {
+            await deleteAccount();
+            setAccessToken("");
+            window.location.href = "/auth/register";
+          }}
+        >
+          Delete Profile
+        </Button>
+      </section>
     </div>
   );
 };
