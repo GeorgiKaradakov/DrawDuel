@@ -1,5 +1,6 @@
 import type { Column } from "@/components/layout/Dashboard/types";
 import { Button } from "@/components/ui/button";
+import { revokeDevice } from "./server";
 
 export const userProperties = [
   {
@@ -12,11 +13,12 @@ export const userProperties = [
 ];
 
 export interface DeviceManagementRow {
+  sessionId: string;
   osName: string;
   browserName: string;
   location: string;
   status: string;
-  action: string;
+  // action: string;
 }
 
 export const DeviceManagementColumns: Column<DeviceManagementRow>[] = [
@@ -65,8 +67,10 @@ export const DeviceManagementColumns: Column<DeviceManagementRow>[] = [
         <Button
           variant="destructive"
           size="sm"
-          onClick={() => {
-            console.log("Revoke session:", row);
+          onClick={async () => {
+            await revokeDevice(row.sessionId).catch((error) => {
+              console.log(error);
+            });
           }}
         >
           Revoke
@@ -78,71 +82,71 @@ export const DeviceManagementColumns: Column<DeviceManagementRow>[] = [
 
 export const DeviceManagementDummyData: DeviceManagementRow[] = [
   {
-    os: "Linux",
-    browser: "Chrome",
+    osName: "Linux",
+    browserName: "Chrome",
     location: "Netherlands",
     status: "Current Session",
     action: "Revoke",
   },
   {
-    os: "Windows 11",
-    browser: "Firefox",
+    osName: "Windows 11",
+    browserName: "Firefox",
     location: "Germany",
     status: "Active",
     action: "Revoke",
   },
   {
-    os: "Android 14",
-    browser: "Chrome",
+    osName: "Android 14",
+    browserName: "Chrome",
     location: "Bulgaria",
     status: "Revoked",
     action: "—",
   },
   {
-    os: "macOS Sonoma",
-    browser: "Safari",
+    osName: "macOS Sonoma",
+    browserName: "Safari",
     location: "France",
     status: "Active",
     action: "Revoke",
   },
   {
-    os: "iPadOS 17",
-    browser: "Safari",
+    osName: "iPadOS 17",
+    browserName: "Safari",
     location: "Italy",
     status: "Revoked",
     action: "—",
   },
   {
-    os: "Windows 10",
-    browser: "Edge",
+    osName: "Windows 10",
+    browserName: "Edge",
     location: "United Kingdom",
     status: "Active",
     action: "Revoke",
   },
   {
-    os: "iOS 17",
-    browser: "Safari",
+    osName: "iOS 17",
+    browserName: "Safari",
     location: "Spain",
     status: "Revoked",
     action: "—",
   },
   {
-    os: "Ubuntu 22.04",
-    browser: "Firefox",
+    osName: "Ubuntu 22.04",
+    browserName: "Firefox",
     location: "Sweden",
     status: "Active",
     action: "Revoke",
   },
   {
-    os: "Arch Linux",
-    browser: "Brave",
+    osName: "Arch Linux",
+    browserName: "Brave",
     location: "Poland",
     status: "Active",
     action: "Revoke",
   },
   {
-    os: "Android 13",
-    browser: "Samsung Internet",
+    osName: "Android 13",
+    browserName: "Samsung Internet",
     location: "Romania",
     status: "Revoked",
     action: "—",

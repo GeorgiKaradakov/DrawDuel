@@ -24,10 +24,11 @@ public class GetSessionInfoUseCase implements GetSessionInfoUseCasePort {
             .map(
                 session -> {
                   return new DeviceEntryDto(
+                      session.getSessionId(),
                       session.getOsName(),
                       session.getUserAgent(),
                       session.getLocation(),
-                      (session.getIpAddress().equals(query.ipAddress()))
+                      (session.getSessionId().equals(query.sessionId()))
                           ? DeviceStatus.CURRENT_SESSION
                           : DeviceStatus.ACTIVE);
                 })

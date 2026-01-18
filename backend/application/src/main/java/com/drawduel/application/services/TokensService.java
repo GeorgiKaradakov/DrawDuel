@@ -42,16 +42,16 @@ public class TokensService {
     return session.getRefreshToken();
   }
 
-  public String generateAccessToken(UUID userId) {
-    return jwtService.generateToken(userId);
+  public String generateAccessToken(UUID userId, UUID sessionId) {
+    return jwtService.generateToken(userId, sessionId);
   }
 
   public String[] generateTokens(
       User user, String ipAdress, String userAgent, String location, String osName) {
+    UUID sessionId = UUID.randomUUID();
     String refreshToken =
-        generateRefreshToken(
-            user.getId(), UUID.randomUUID(), ipAdress, userAgent, location, osName);
-    String accessToken = generateAccessToken(user.getId());
+        generateRefreshToken(user.getId(), sessionId, ipAdress, userAgent, location, osName);
+    String accessToken = generateAccessToken(user.getId(), sessionId);
     return new String[] {accessToken, refreshToken};
   }
 
@@ -64,7 +64,7 @@ public class TokensService {
       String osName) {
     String refreshToken =
         generateRefreshToken(user.getId(), sessionId, ipAdress, userAgent, location, osName);
-    String accessToken = generateAccessToken(user.getId());
+    String accessToken = generateAccessToken(user.getId(), sessionId);
     return new String[] {accessToken, refreshToken};
   }
 }

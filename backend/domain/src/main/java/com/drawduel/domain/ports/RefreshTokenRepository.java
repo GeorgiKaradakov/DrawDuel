@@ -11,6 +11,8 @@ public interface RefreshTokenRepository {
 
   Optional<UserSession> findByRefreshToken(String refreshToken);
 
+  Optional<UserSession> findActiveSessionBySessionId(UUID sessionId);
+
   List<UserSession> findActiveSessionsByUserId(UUID userId);
 
   void revokeRefreshToken(String refreshToken);

@@ -7,6 +7,7 @@ import com.drawduel.application.ports.ChangePasswordUseCasePort;
 import com.drawduel.application.ports.DeleteAccountUseCasePort;
 import com.drawduel.application.ports.GetProfileUseCasePort;
 import com.drawduel.application.ports.GetSessionInfoUseCasePort;
+import com.drawduel.application.ports.RevokeSessionUseCasePort;
 import com.drawduel.application.ports.UpdateProfileUseCasePort;
 import com.drawduel.application.services.JwtService;
 import jakarta.servlet.http.Cookie;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserSettingsController {
 
+  private final RevokeSessionUseCasePort revokeSessionUseCase;
   private final UpdateProfileUseCasePort updateProfileUseCase;
   private final DeleteAccountUseCasePort deleteAccountUseCase;
   private final ChangePasswordUseCasePort changePasswordUseCase;
@@ -99,15 +101,31 @@ public class UserSettingsController {
   @GetMapping("/get-devices")
   public ResponseEntity<?> getDevices(
       @RequestHeader("Authorization") String authHeader, HttpServletRequest request) {
-    UUID userId = jwtService.extractUserId(authHeader.substring(7));
-    String ipAddress = extractClientIp(request);
+    String accessToken = authHeader.substring(7);
+    UUID userId = jwtService.extractUserId(accessToken);
+    UUID sessionId = jwtService.extractSessionIdAllowExpired(accessToken);
 
     DevicesResponseDto devices =
         getSessionInfoUseCase
-            .handle(new GetSessionInfoUseCasePort.Query(userId, ipAddress))
+            .handle(new GetSessionInfoUseCasePort.Query(userId, sessionId))
             .devices();
 
     return ResponseEntity.ok(devices);
+  }
+
+  @DeleteMapping("/revoke-session/{sessionId}")
+  public ResponseEntity<?> revokeSession(
+      @PathVariable("sessionId") UUID sessionId,
+      @RequestHeader("Authorization") String authHeader) {
+
+    String accessToken = authHeader.substring(7);
+    UUID userId = jwtService.extractUserId(accessToken);
+    UUID currentSessionId = jwtService.extractSessionIdAllowExpired(accessToken);
+
+    revokeSessionUseCase.handle(
+        new RevokeSessionUseCasePort.Query(userId, sessionId, currentSessionId));
+
+    return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/delete-account")

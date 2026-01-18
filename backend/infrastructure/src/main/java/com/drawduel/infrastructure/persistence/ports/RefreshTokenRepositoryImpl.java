@@ -52,6 +52,11 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
   }
 
   @Override
+  public Optional<UserSession> findActiveSessionBySessionId(UUID sessionId) {
+    return tokensJpaRepository.findActiveSessionBySessionId(sessionId).map(mapper::toDomain);
+  }
+
+  @Override
   public void deleteByUserId(UUID userId) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'deleteByUserId'");

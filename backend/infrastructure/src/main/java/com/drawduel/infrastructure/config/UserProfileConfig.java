@@ -5,11 +5,13 @@ import com.drawduel.application.ports.DeleteAccountUseCasePort;
 import com.drawduel.application.ports.GetProfileUseCasePort;
 import com.drawduel.application.ports.GetSessionInfoUseCasePort;
 import com.drawduel.application.ports.ImageStorageSevicePort;
+import com.drawduel.application.ports.RevokeSessionUseCasePort;
 import com.drawduel.application.ports.UpdateProfileUseCasePort;
 import com.drawduel.application.usecases.ChangePasswordUseCase;
 import com.drawduel.application.usecases.DeleteAccountUseCase;
 import com.drawduel.application.usecases.GetProfileUseCase;
 import com.drawduel.application.usecases.GetSessionInfoUseCase;
+import com.drawduel.application.usecases.RevokeSessionUseCase;
 import com.drawduel.application.usecases.UpdateProfileUseCase;
 import com.drawduel.domain.ports.PasswordHasher;
 import com.drawduel.domain.ports.RefreshTokenRepository;
@@ -19,6 +21,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class UserProfileConfig {
+
+  @Bean
+  public RevokeSessionUseCasePort revokeSessionUseCase(
+      RefreshTokenRepository refreshTokenRepository) {
+    return new RevokeSessionUseCase(refreshTokenRepository);
+  }
 
   @Bean
   public GetSessionInfoUseCasePort getSessionInfoUseCase(

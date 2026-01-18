@@ -25,9 +25,6 @@ public class RegisterUseCase implements RegisterUseCasePort {
     RegisterRequestDto req = q.request();
     byte[] imageBytes = q.imageBytes();
 
-    System.out.println(
-        imageBytes == null ? "No image provided" : "Image provided, size: " + imageBytes.length);
-
     userRepo
         .findByEmail(req.getEmail())
         .ifPresent(

@@ -28,9 +28,10 @@ public class JwtService {
     return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
   }
 
-  public String generateToken(UUID userId) {
+  public String generateToken(UUID userId, UUID sessionId) {
     return Jwts.builder()
         .setSubject(userId.toString())
+        .claim("sessionId", sessionId.toString())
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
         .signWith(key)
@@ -60,6 +61,12 @@ public class JwtService {
   public UUID extractUserIdAllowExpired(String token) {
     Claims claims = extractAllClaimsAllowExpired(token);
     return UUID.fromString(claims.getSubject());
+  }
+
+  public UUID extractSessionIdAllowExpired(String token) {
+    Claims claims = extractAllClaimsAllowExpired(token);
+    String sessionId = claims.get("sessionId", String.class);
+    return UUID.fromString(sessionId);
   }
 
   private Claims extractAllClaimsAllowExpired(String token) {

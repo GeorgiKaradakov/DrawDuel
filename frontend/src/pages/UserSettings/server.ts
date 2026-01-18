@@ -49,6 +49,10 @@ export const getDevicesData = async () => {
   return await api.get("/api/user/get-devices");
 };
 
+export const revokeDevice = async (deviceId: string) => {
+  return await api.delete(`/api/user/revoke-session/${deviceId}`);
+};
+
 export const deleteAccount = async () => {
   await api.delete("/api/user/delete-account").catch((error) => {
     console.log(error);

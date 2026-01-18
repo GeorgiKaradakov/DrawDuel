@@ -34,6 +34,15 @@ public interface TokensJpaRepository extends JpaRepository<JpaTokensEntity, UUID
       """)
   List<JpaTokensEntity> findActiveSessionsByUserId(UUID userId);
 
+  @Query(
+      """
+      SELECT t FROM JpaTokensEntity t
+      WHERE t.sessionId = :sessionId
+        AND t.revoked = false
+        AND t.expiresAt > CURRENT_TIMESTAMP
+      """)
+  Optional<JpaTokensEntity> findActiveSessionBySessionId(UUID sessionId);
+
   @Transactional
   @Modifying
   @Query("DELETE FROM JpaTokensEntity t WHERE t.refreshToken = :token")

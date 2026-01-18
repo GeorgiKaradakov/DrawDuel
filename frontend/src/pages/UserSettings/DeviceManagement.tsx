@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   DeviceManagementColumns,
-  DeviceManagementDummyData,
   type DeviceManagementRow,
 } from "./static-data.tsx";
 import { GenericTable } from "@/components/layout/Dashboard/components/GenericTable";
