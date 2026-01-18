@@ -12,6 +12,7 @@ public class SaveRefreshTokenUseCase implements SaveRefreshTokenUseCasePort {
 
   @Override
   public void handle(Query q) {
+    System.out.println(q.session().getSessionId());
     refreshTokenRepository.save(q.session());
   }
 }

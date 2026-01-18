@@ -6,6 +6,6 @@ import AuthProvider from "./context/authProvider/AuthProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <AuthProvider>
-    <RouterProvider router={router} />,
+    <RouterProvider router={router} />
   </AuthProvider>,
 );

@@ -16,14 +16,21 @@ public class TokensService {
   private final Integer refreshTokenValidityDays;
 
   private String generateRefreshToken(
-      UUID userId, String ipAdress, String userAgent, String location) {
+      UUID userId,
+      UUID sessionId,
+      String ipAdress,
+      String userAgent,
+      String location,
+      String osName) {
     UserSession session =
         new UserSession(
             UUID.randomUUID(),
             userId,
+            sessionId,
             ipAdress,
             userAgent,
             location,
+            osName,
             jwtService.generateRefreshToken(),
             false,
             Instant.now(),
@@ -39,14 +46,24 @@ public class TokensService {
     return jwtService.generateToken(userId);
   }
 
-  public String[] generateTokens(User user, String ipAdress, String userAgent, String location) {
-    String refreshToken = generateRefreshToken(user.getId(), ipAdress, userAgent, location);
+  public String[] generateTokens(
+      User user, String ipAdress, String userAgent, String location, String osName) {
+    String refreshToken =
+        generateRefreshToken(
+            user.getId(), UUID.randomUUID(), ipAdress, userAgent, location, osName);
     String accessToken = generateAccessToken(user.getId());
     return new String[] {accessToken, refreshToken};
   }
 
-  public String[] generateTokens(UserDto user, String ipAdress, String userAgent, String location) {
-    String refreshToken = generateRefreshToken(user.getId(), ipAdress, userAgent, location);
+  public String[] generateTokens(
+      UserDto user,
+      UUID sessionId,
+      String ipAdress,
+      String userAgent,
+      String location,
+      String osName) {
+    String refreshToken =
+        generateRefreshToken(user.getId(), sessionId, ipAdress, userAgent, location, osName);
     String accessToken = generateAccessToken(user.getId());
     return new String[] {accessToken, refreshToken};
   }

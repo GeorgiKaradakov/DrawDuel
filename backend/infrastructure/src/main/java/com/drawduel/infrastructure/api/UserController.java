@@ -37,7 +37,6 @@ public class UserController {
 
   @GetMapping("/me")
   public Object getMyProfile(@RequestHeader("Authorization") String authHeader) {
-
     UUID userId = jwtService.extractUserId(authHeader.substring(7));
 
     return getProfileUseCase.handle(new GetProfileUseCasePort.Query(userId)).profile();

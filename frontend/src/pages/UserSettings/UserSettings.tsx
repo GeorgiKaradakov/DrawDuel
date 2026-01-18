@@ -1,5 +1,5 @@
 import UserProperty from "@/components/layout/Settings/UserProperty";
-import { userProperties } from "./static-data";
+import { userProperties } from "./static-data.tsx";
 import { useAuth } from "@/context/authProvider/useAuth";
 
 const UserSettings = () => {

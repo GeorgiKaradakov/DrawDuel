@@ -59,6 +59,7 @@ public class AuthController {
     String Ip = extractClientIp(request);
     String userAgent = request.getHeader("User-Agent");
     String location = "unknown";
+    String osName = System.getProperty("os.name");
     byte[] imageBytes = null;
 
     if (profileImage != null && !profileImage.isEmpty()) {
@@ -72,6 +73,7 @@ public class AuthController {
     req.setIpAddress(Ip);
     req.setUserAgent(userAgent);
     req.setLocation(location);
+    req.setOsName(osName);
 
     var tokens = registerUseCase.handle(new RegisterUseCasePort.Query(req, imageBytes));
     ResponseCookie cookie =
@@ -93,11 +95,12 @@ public class AuthController {
     String Ip = extractClientIp(request);
     String userAgent = request.getHeader("User-Agent");
     String location = "unknown";
+    String osName = System.getProperty("os.name");
 
     LoginUseCase.Result tokens =
         loginUseCase.handle(
             new LoginUseCase.Query(
-                req.getIdentifier(), req.getPassword(), Ip, userAgent, location));
+                req.getIdentifier(), req.getPassword(), Ip, userAgent, location, osName));
 
     System.out.println("does it come here");
 
@@ -164,7 +167,12 @@ public class AuthController {
 
     String[] tokens =
         tokensService.generateTokens(
-            user, session.getIpAddress(), session.getUserAgent(), session.getLocation());
+            user,
+            session.getSessionId(),
+            session.getIpAddress(),
+            session.getUserAgent(),
+            session.getLocation(),
+            session.getOsName());
     ResponseCookie cookie =
         ResponseCookie.from("refreshToken", tokens[1])
             .httpOnly(true)

@@ -61,7 +61,7 @@ public class RegisterUseCase implements RegisterUseCasePort {
 
     String[] tokens =
         tokensService.generateTokens(
-            user, req.getIpAddress(), req.getUserAgent(), req.getLocation());
+            user, req.getIpAddress(), req.getUserAgent(), req.getLocation(), req.getOsName());
 
     return new Result(new AuthResponseDto(tokens[0], tokens[1]));
   }
