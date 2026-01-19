@@ -29,6 +29,7 @@ const AccountSection = ({ className }: AccountSectionProps) => {
 
       <div
         className="p-1 hover:bg-neutral-300/20 rounded-lg hover:scale-102 transition-all ease-in-out transition-duration-300 hover:cursor-pointer"
+        data-cy="logout-submit"
         onClick={logout}
       >
         <LogOut className="w-6 h-6 text-neutral-50" />

@@ -20,13 +20,14 @@ const DeviceManagement = () => {
       setRevokingSessionId(sessionId);
       await revokeDevice(sessionId)
         .then(() => {
+          setDevicesData((prev) =>
+            prev.filter((d) => d.sessionId !== sessionId),
+          );
           successToast("Device session revoked");
         })
-        .catch(() => {
-          errorToast("Failed to revoke device session.");
+        .catch((error) => {
+          errorToast(error.response?.data || "Failed to revoke device");
         });
-
-      setDevicesData((prev) => prev.filter((d) => d.sessionId !== sessionId));
     } catch (e) {
       console.error(e);
     } finally {
