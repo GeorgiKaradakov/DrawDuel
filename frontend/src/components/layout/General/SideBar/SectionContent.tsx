@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import type { SectionContentProps } from "./types";
-import { useNavigate } from "react-router";
 
 const SectionContent = ({
   className,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { type AuthUser, type AuthProviderProps } from "./types";
 import { authApi } from "@/pages/Auth/auth";
 import { api } from "@/lib/axios";

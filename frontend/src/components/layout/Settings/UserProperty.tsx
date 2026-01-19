@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import type { UserPropertyProps } from "@/pages/UserSettings/types";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
-import { api, apiWithImage } from "@/lib/axios";
+import { api } from "@/lib/axios";
 import {
   updateEmail,
   updateProfileImage,

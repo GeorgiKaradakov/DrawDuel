@@ -1,6 +1,5 @@
 import type { Column } from "@/components/layout/Dashboard/types";
 import { Button } from "@/components/ui/button";
-import { revokeDevice } from "./server";
 
 export const userProperties = [
   {
@@ -18,7 +17,7 @@ export interface DeviceManagementRow {
   browserName: string;
   location: string;
   status: string;
-  // action: string;
+  action: string;
 }
 
 export const DeviceManagementColumns = (
@@ -80,78 +79,5 @@ export const DeviceManagementColumns = (
         </Button>
       );
     },
-  },
-];
-
-export const DeviceManagementDummyData: DeviceManagementRow[] = [
-  {
-    osName: "Linux",
-    browserName: "Chrome",
-    location: "Netherlands",
-    status: "Current Session",
-    action: "Revoke",
-  },
-  {
-    osName: "Windows 11",
-    browserName: "Firefox",
-    location: "Germany",
-    status: "Active",
-    action: "Revoke",
-  },
-  {
-    osName: "Android 14",
-    browserName: "Chrome",
-    location: "Bulgaria",
-    status: "Revoked",
-    action: "—",
-  },
-  {
-    osName: "macOS Sonoma",
-    browserName: "Safari",
-    location: "France",
-    status: "Active",
-    action: "Revoke",
-  },
-  {
-    osName: "iPadOS 17",
-    browserName: "Safari",
-    location: "Italy",
-    status: "Revoked",
-    action: "—",
-  },
-  {
-    osName: "Windows 10",
-    browserName: "Edge",
-    location: "United Kingdom",
-    status: "Active",
-    action: "Revoke",
-  },
-  {
-    osName: "iOS 17",
-    browserName: "Safari",
-    location: "Spain",
-    status: "Revoked",
-    action: "—",
-  },
-  {
-    osName: "Ubuntu 22.04",
-    browserName: "Firefox",
-    location: "Sweden",
-    status: "Active",
-    action: "Revoke",
-  },
-  {
-    osName: "Arch Linux",
-    browserName: "Brave",
-    location: "Poland",
-    status: "Active",
-    action: "Revoke",
-  },
-  {
-    osName: "Android 13",
-    browserName: "Samsung Internet",
-    location: "Romania",
-    status: "Revoked",
-    action: "—",
   },
 ];
