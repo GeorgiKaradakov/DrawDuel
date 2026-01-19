@@ -6,9 +6,11 @@ import { Form } from "@/components/ui/form";
 import FormInput from "@/components/layout/Auth/FormInput";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
-import { register } from "./auth";
+import { useAuth } from "@/context/authProvider/useAuth";
+import FormImageInput from "@/components/layout/Auth/FormImageInput";
 
 const Register = () => {
+  const { register } = useAuth();
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -27,9 +29,9 @@ const Register = () => {
         values.email,
         values.pass,
         values.passRepeat,
+        values.profileImage,
       );
 
-      // ✅ user is immediately authenticated (token + cookie)
       navigate("/dashboard");
     } catch (err: any) {
       const message: string = err.message;
@@ -54,6 +56,12 @@ const Register = () => {
           className="w-full h-full flex flex-col justify-center items-center space-y-8"
           onSubmit={form.handleSubmit(onSubmit)}
         >
+          <FormImageInput
+            formControl={form.control}
+            name="profileImage"
+            label="Profile Image (optional):"
+            className="w-4/5"
+          />
           <div className="w-full flex flex-col justify-center items-center space-y-2">
             <FormInput
               formControl={form.control}

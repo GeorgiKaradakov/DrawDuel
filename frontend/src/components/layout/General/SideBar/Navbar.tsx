@@ -1,16 +1,15 @@
-import { Button } from "@/components/ui/button";
 import { getUserIdFromToken } from "@/lib/jwt";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import WebsiteStamp from "../WebsiteStamp";
 import { sectionContents, sections } from "./staticData";
 import Section from "./Section";
 import SectionContent from "./SectionContent";
 import { useEffect, useState } from "react";
-import { LogOut } from "lucide-react";
-import { logout } from "@/pages/Auth/auth";
+import AccountSection from "./AccountSection";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [currentSectionItem, setCurrentSectionItem] =
     useState<string>("Dashboard");
@@ -29,9 +28,10 @@ const Navbar = () => {
         />
         <div className="w-full border-b border-b-neutral-600"></div>
       </div>
+
       <div className="w-full h-5/7 space-y-8">
         {sections.map(({ id, sectionName }) => (
-          <Section className="space-y-4" key={id} sectionName={sectionName}>
+          <Section className="space-y-2" key={id} sectionName={sectionName}>
             {sectionContents[id].map(({ id: contentId, name, url }) => {
               const token = localStorage.getItem("accessToken"); // stored after login
               const userId = getUserIdFromToken(token || "");
@@ -52,10 +52,12 @@ const Navbar = () => {
 
               return (
                 <SectionContent
-                  className={`${isActive ? "bg-indigo-400" : ""}`}
+                  className={`${isActive ? "bg-indigo-500" : ""}`}
                   key={contentId}
                   name={name}
-                  url={resolvedUrl}
+                  handleOnClick={() => {
+                    navigate(resolvedUrl);
+                  }}
                 />
               );
             })}
@@ -63,17 +65,7 @@ const Navbar = () => {
         ))}
       </div>
       <div className="px-3 w-full h-1/7 flex justify-center items-center">
-        <Button
-          variant="default"
-          className="p-2 w-full bg-neutral-600 text-lg text-neutral-50 font-bold hover:bg-red-400"
-          onClick={() => logout()}
-          data-cy="logout-submit"
-        >
-          <span>
-            <LogOut />
-          </span>
-          Log Out
-        </Button>
+        <AccountSection />
       </div>
     </div>
   );

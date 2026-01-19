@@ -3,6 +3,7 @@ package com.drawduel.infrastructure.persistence.jpa.repositories;
 import com.drawduel.infrastructure.persistence.jpa.entities.JpaTokensEntity;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +22,26 @@ public interface TokensJpaRepository extends JpaRepository<JpaTokensEntity, UUID
   // @Modifying
   // @Query("DELETE FROM JpaTokensEntity t WHERE t.userId = :userId")
   // void deleteByUserId(UUID userId);
+
+  @Query(
+      """
+        SELECT t
+        FROM JpaTokensEntity t
+        WHERE t.user.id = :userId
+          AND t.revoked = false
+          AND t.expiresAt > CURRENT_TIMESTAMP
+        ORDER BY t.issuedAt DESC
+      """)
+  List<JpaTokensEntity> findActiveSessionsByUserId(UUID userId);
+
+  @Query(
+      """
+      SELECT t FROM JpaTokensEntity t
+      WHERE t.sessionId = :sessionId
+        AND t.revoked = false
+        AND t.expiresAt > CURRENT_TIMESTAMP
+      """)
+  Optional<JpaTokensEntity> findActiveSessionBySessionId(UUID sessionId);
 
   @Transactional
   @Modifying

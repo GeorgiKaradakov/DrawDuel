@@ -13,6 +13,7 @@ export function GenericTable<T>({
   data,
   columns,
   className,
+  tableHeaderClassName,
 }: GenericTableProps<T>) {
   return (
     <div
@@ -23,7 +24,9 @@ export function GenericTable<T>({
     >
       <Table className="w-full border-collapse">
         <TableHeader className="sticky top-0 bg-neutral-700 z-10">
-          <TableRow className="border-b border-neutral-500">
+          <TableRow
+            className={cn("border-b border-neutral-500", tableHeaderClassName)}
+          >
             {columns.map((col) => (
               <TableHead
                 key={String(col.key)}

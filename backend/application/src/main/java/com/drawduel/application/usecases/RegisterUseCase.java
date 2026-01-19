@@ -2,6 +2,7 @@ package com.drawduel.application.usecases;
 
 import com.drawduel.application.dtos.AuthResponseDto;
 import com.drawduel.application.dtos.RegisterRequestDto;
+import com.drawduel.application.ports.ImageStorageSevicePort;
 import com.drawduel.application.ports.RegisterUseCasePort;
 import com.drawduel.application.services.TokensService;
 import com.drawduel.domain.models.User;
@@ -9,22 +10,20 @@ import com.drawduel.domain.ports.PasswordHasher;
 import com.drawduel.domain.ports.UserRepository;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class RegisterUseCase implements RegisterUseCasePort {
   private final UserRepository userRepo;
   private final PasswordHasher hasher;
   private final TokensService tokensService;
-
-  public RegisterUseCase(
-      UserRepository userRepo, PasswordHasher hasher, TokensService tokensService) {
-    this.userRepo = userRepo;
-    this.hasher = hasher;
-    this.tokensService = tokensService;
-  }
+  private final ImageStorageSevicePort imageStorage;
+  private final String DEFAULT_PROFILE_IMAGE_URL;
 
   @Override
   public Result handle(Query q) {
     RegisterRequestDto req = q.request();
+    byte[] imageBytes = q.imageBytes();
 
     userRepo
         .findByEmail(req.getEmail())
@@ -44,13 +43,22 @@ public class RegisterUseCase implements RegisterUseCasePort {
       throw new IllegalArgumentException("Passwords do not match");
     }
 
+    UUID userId = UUID.randomUUID();
+    String profileImageUrl = null;
+    if (imageBytes != null) {
+      profileImageUrl = imageStorage.uploadProfileImage(imageBytes, userId);
+    } else {
+      profileImageUrl = DEFAULT_PROFILE_IMAGE_URL;
+    }
+
     String hash = hasher.hash(req.getPass());
-    User user = new User(UUID.randomUUID(), req.getUsername(), req.getEmail(), hash, Instant.now());
+    User user =
+        new User(userId, req.getUsername(), req.getEmail(), hash, Instant.now(), profileImageUrl);
     userRepo.save(user);
 
     String[] tokens =
         tokensService.generateTokens(
-            user, req.getIpAddress(), req.getUserAgent(), req.getLocation());
+            user, req.getIpAddress(), req.getUserAgent(), req.getLocation(), req.getOsName());
 
     return new Result(new AuthResponseDto(tokens[0], tokens[1]));
   }

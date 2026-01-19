@@ -37,7 +37,7 @@ public class LoginUseCase implements LoginUseCasePort {
     }
 
     String[] tokens =
-        tokensService.generateTokens(user, q.ipAddress(), q.userAgent(), q.location());
+        tokensService.generateTokens(user, q.ipAddress(), q.userAgent(), q.location(), q.osName());
     return new Result(tokens[0], tokens[1]);
   }
 }

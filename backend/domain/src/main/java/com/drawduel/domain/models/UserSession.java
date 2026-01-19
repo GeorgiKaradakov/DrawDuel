@@ -11,9 +11,11 @@ public class UserSession {
 
   private UUID id;
   private UUID userId;
+  private UUID sessionId;
   private String ipAddress;
   private String userAgent;
   private String location;
+  private String osName;
   private String refreshToken;
   private Boolean revoked;
   private Instant issuedAt;

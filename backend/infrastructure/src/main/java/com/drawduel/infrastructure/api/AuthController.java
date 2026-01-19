@@ -6,6 +6,7 @@ import com.drawduel.application.dtos.UserDto;
 import com.drawduel.application.dtos.UserSessionDto;
 import com.drawduel.application.ports.GetRefreshTokenUseCasePort;
 import com.drawduel.application.ports.GetUserByIdUseCasePort;
+import com.drawduel.application.ports.GetUserInfoUseCasePort;
 import com.drawduel.application.ports.LoginUseCasePort;
 import com.drawduel.application.ports.LogoutUseCasePort;
 import com.drawduel.application.ports.RegisterUseCasePort;
@@ -15,6 +16,7 @@ import com.drawduel.application.usecases.GetRefreshTokenUseCase;
 import com.drawduel.application.usecases.GetUserByIdUseCase;
 import com.drawduel.application.usecases.LoginUseCase;
 import com.drawduel.application.usecases.RevokeRefreshTokenUseCase;
+import com.drawduel.infrastructure.persistence.security.SecurityUser;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,10 +25,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import ua_parser.Client;
+import ua_parser.Parser;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,23 +46,43 @@ public class AuthController {
   private final RegisterUseCasePort registerUseCase;
   private final LoginUseCasePort loginUseCase;
   private final GetUserByIdUseCasePort getUserByIdUseCase;
+  private final GetUserInfoUseCasePort getUserInfoUseCase;
   private final RevokeRefreshTokenUseCasePort revokeRefreshTokenUseCase;
   private final GetRefreshTokenUseCasePort getRefreshTokenUseCase;
   private final TokensService tokensService;
   private final LogoutUseCasePort logoutUseCase;
 
+  private static final Parser parser = new Parser();
+
   @PostMapping("/register")
   public ResponseEntity<AccessTokenDto> register(
-      @RequestBody RegisterRequestDto req, HttpServletResponse res, HttpServletRequest request) {
+      @ModelAttribute RegisterRequestDto req,
+      @RequestParam(required = false) MultipartFile profileImage,
+      HttpServletResponse res,
+      HttpServletRequest request) {
     String Ip = extractClientIp(request);
     String userAgent = request.getHeader("User-Agent");
     String location = "unknown";
+    String osName = System.getProperty("os.name");
+    byte[] imageBytes = null;
+
+    Client client = parser.parse(userAgent);
+    String browserName = client.userAgent.family;
+
+    if (profileImage != null && !profileImage.isEmpty()) {
+      try {
+        imageBytes = profileImage.getBytes();
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Failed to read profile image", e);
+      }
+    }
 
     req.setIpAddress(Ip);
-    req.setUserAgent(userAgent);
+    req.setUserAgent(browserName);
     req.setLocation(location);
+    req.setOsName(osName);
 
-    var tokens = registerUseCase.handle(new RegisterUseCasePort.Query(req));
+    var tokens = registerUseCase.handle(new RegisterUseCasePort.Query(req, imageBytes));
     ResponseCookie cookie =
         ResponseCookie.from("refreshToken", tokens.response().getRefreshToken())
             .httpOnly(true)
@@ -73,11 +102,15 @@ public class AuthController {
     String Ip = extractClientIp(request);
     String userAgent = request.getHeader("User-Agent");
     String location = "unknown";
+    String osName = System.getProperty("os.name");
+
+    Client client = parser.parse(userAgent);
+    String browserName = client.userAgent.family;
 
     LoginUseCase.Result tokens =
         loginUseCase.handle(
             new LoginUseCase.Query(
-                req.getIdentifier(), req.getPassword(), Ip, userAgent, location));
+                req.getIdentifier(), req.getPassword(), Ip, browserName, location, osName));
 
     ResponseCookie cookie =
         ResponseCookie.from("refreshToken", tokens.refreshToken())
@@ -90,6 +123,25 @@ public class AuthController {
     res.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString());
 
     return ResponseEntity.ok(new AccessTokenDto(tokens.accessToken()));
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<UserDto> getUserInfo(Authentication authentication) {
+    if (authentication == null || !(authentication.getPrincipal() instanceof SecurityUser)) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    SecurityUser principal = (SecurityUser) authentication.getPrincipal();
+
+    UserDto user;
+    try {
+      user =
+          getUserInfoUseCase.handle(new GetUserInfoUseCasePort.Query(principal.getId())).response();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    return ResponseEntity.ok(user);
   }
 
   @PostMapping("/refresh-tokens")
@@ -123,7 +175,12 @@ public class AuthController {
 
     String[] tokens =
         tokensService.generateTokens(
-            user, session.getIpAddress(), session.getUserAgent(), session.getLocation());
+            user,
+            session.getSessionId(),
+            session.getIpAddress(),
+            session.getUserAgent(),
+            session.getLocation(),
+            session.getOsName());
     ResponseCookie cookie =
         ResponseCookie.from("refreshToken", tokens[1])
             .httpOnly(true)
@@ -188,7 +245,7 @@ public class AuthController {
   private void deleteRefreshTokenCookie(HttpServletResponse response) {
     Cookie cookie = new Cookie("refreshToken", "");
     cookie.setHttpOnly(true);
-    cookie.setSecure(true); // keep consistent with prod
+    cookie.setSecure(true);
     cookie.setPath("/");
     cookie.setMaxAge(0);
     response.addCookie(cookie);

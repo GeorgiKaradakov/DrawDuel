@@ -7,8 +7,8 @@ import PresentWinner from "@/components/layout/Game/PresentWinner";
 import { useNavigate } from "react-router";
 import { TimerProvider } from "@/context/TimerContext";
 import GameDrawingCanvas from "@/components/layout/Game/GameDrawingCanvas";
-import { useGame } from "./context/useGame";
 import { sendLeaveGame } from "@/lib/webscoket/gameSocket";
+import { useGame } from "@/context/gameContextProvider/useGame";
 
 const GameDraw = () => {
   const { state, dispatch } = useGame();

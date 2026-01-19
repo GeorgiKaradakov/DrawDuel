@@ -1,70 +1,83 @@
-describe("User profile management", () => {
-  const timestamp = Date.now();
-
-  const user = {
-    username: `user_${timestamp}`,
-    email: `user_${timestamp}@test.com`,
-    password: "Test123!",
+describe("User Settings E2E", () => {
+  let TEST_USER = {
+    email: "cypress@test.com",
+    password: "Password123!",
   };
 
-  before(() => {
-    cy.register(user.username, user.email, user.password);
+  beforeEach(() => {
+    cy.login(TEST_USER.email, TEST_USER.password);
+    cy.visit("/dashboard");
   });
 
-  it("loads update profile page with correct data", () => {
-    cy.login(user.email, user.password);
+  it("loads the User Settings page", () => {
+    cy.contains("Account Settings").click();
 
-    cy.getUserIdFromToken().then((userId) => {
-      cy.visit(`/user-settings/update-profile/${userId}`);
-    });
-
-    cy.contains("Update Profile").should("exist");
-
-    cy.get('input[name="username"]').should("have.value", user.username);
-    cy.get('input[name="email"]').should("have.value", user.email);
+    cy.contains("Account").should("be.visible");
+    cy.contains("Security").should("be.visible");
+    cy.contains("Devices").should("be.visible");
   });
 
-  it("updates profile successfully", () => {
-    const updatedUser = {
-      username: `updated_${timestamp}`,
-      email: `updated_${timestamp}@test.com`,
-    };
+  it("updates username successfully", () => {
+    const newUsername = `user_${Date.now()}`;
 
-    cy.login(user.email, user.password);
+    cy.contains("Account Settings").click();
 
-    cy.getUserIdFromToken().then((userId) => {
-      cy.visit(`/user-settings/update-profile/${userId}`);
-    });
+    cy.contains("Username").parent().find("input").clear().type(newUsername);
 
-    cy.on("window:alert", (text) => {
-      expect(text).to.eq("Update successful!");
-    });
+    cy.contains("Save Changes").click();
 
-    cy.get('input[name="username"]').clear().type(updatedUser.username);
-    cy.get('input[name="email"]').clear().type(updatedUser.email);
-
-    cy.contains("Save changes").click();
-
-    // Update local object for later assertions
-    user.username = updatedUser.username;
-    user.email = updatedUser.email;
+    cy.contains("Username updated successfully!").should("be.visible");
   });
 
-  it("deletes account and logs user out", () => {
-    cy.login(user.email, user.password);
+  it("shows active devices", () => {
+    cy.contains("Account Settings").click();
 
-    cy.getUserIdFromToken().then((userId) => {
-      cy.visit(`/user-settings/update-profile/${userId}`);
+    cy.contains("Devices").click();
+    cy.get("table").within(() => {
+      cy.contains("Operating System").should("be.visible");
+      cy.contains("Browser").should("be.visible");
+      cy.contains("Status").should("be.visible");
     });
+  });
 
-    cy.contains("Delete account").click();
+  it("does not allow revoking current session", () => {
+    cy.contains("Account Settings").click();
 
-    cy.on("window:confirm", () => true);
+    cy.contains("Devices").click();
 
-    cy.url().should("include", "/auth/login");
+    cy.contains("current session")
+      .parent()
+      .parent()
+      .within(() => {
+        cy.contains("Revoke").click();
+      });
 
-    cy.window().then((win) => {
-      expect(win.localStorage.getItem("accessToken")).to.be.empty;
-    });
+    cy.contains("Cannot revoke current session").should("be.visible");
+  });
+
+  it("changes password successfully", () => {
+    cy.contains("Account Settings").click();
+    cy.contains("Security").click();
+
+    cy.get('input[name="currentPass"]').type(TEST_USER.password);
+    TEST_USER.password = "NewPassword123!";
+    cy.get('input[name="newPass"]').type(TEST_USER.password);
+
+    cy.contains("Change Password").click();
+
+    cy.contains("Password updated successfully!").should("be.visible");
+  });
+
+  it("updates email successfully", () => {
+    const newEmail = `test_${Date.now()}@mail.com`;
+
+    cy.contains("Account Settings").click();
+    cy.scrollTo("right");
+
+    cy.contains("Email").parent().find("input").clear().type(newEmail);
+
+    cy.contains("Email").parent().contains("Save Changes").click();
+
+    cy.contains("Email updated successfully!").should("be.visible");
   });
 });

@@ -15,4 +15,5 @@ public class User {
   private String email;
   private String passHash;
   private Instant createdAt;
+  private String profileImageUrl;
 }

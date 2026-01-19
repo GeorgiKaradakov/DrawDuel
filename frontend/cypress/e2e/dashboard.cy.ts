@@ -1,13 +1,8 @@
 describe("Dashboard", () => {
   const user = {
-    username: "dashUser",
-    email: "dashboard@test.com",
+    email: "cypress@test.com",
     password: "Password123!",
   };
-
-  before(() => {
-    cy.register(user.username, user.email, user.password);
-  });
 
   beforeEach(() => {
     cy.login(user.email, user.password);

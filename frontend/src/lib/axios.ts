@@ -9,11 +9,27 @@ export const api = axios.create({
   },
 });
 
+export const apiWithImage = axios.create({
+  baseURL: import.meta.env.API_URL || "http://localhost:8080",
+  withCredentials: true,
+});
+
 const refreshClient = axios.create({
   baseURL: import.meta.env.API_URL || "http://localhost:8080",
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
+
+apiWithImage.interceptors.request.use(
+  (config) => {
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
 api.interceptors.request.use(
   (config) => {

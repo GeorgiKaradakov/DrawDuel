@@ -54,10 +54,17 @@ function FormInput<T extends FieldValues>({
                         {...field}
                       />
                       <div
-                        className="absolute right-1 top-1/2 -translate-1/2 hover:cursor-pointer hover:scale-110 select-none"
-                        onClick={() => setShowPass((p) => !p)}
+                        className="absolute flex justify-center items-center -right-1 top-1/2 -translate-1/2 h-full bg-transparent hover:cursor-pointer hover:scale-110 hover:bg-transparent select-none"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowPass((p) => !p);
+                        }}
                       >
-                        {showPass ? <EyeOff /> : <Eye />}
+                        {showPass ? (
+                          <EyeOff className="size-7" />
+                        ) : (
+                          <Eye className="size-7" />
+                        )}
                       </div>
                     </>
                   </FormDescrriptionToolTip>

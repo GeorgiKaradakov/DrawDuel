@@ -1,55 +1,64 @@
 import { setAccessToken } from "@/lib/api";
-import { api } from "@/lib/axios";
+import { api, apiWithImage } from "@/lib/axios";
 
-export const login = async (identifier: string, pass: string) => {
-  try {
-    const response = await api.post("/api/auth/login", {
-      identifier,
-      password: pass,
-    });
+export const authApi = () => {
+  const apiLogin = async (identifier: string, pass: string) => {
+    try {
+      const response = await api.post("/api/auth/login", {
+        identifier,
+        password: pass,
+      });
 
-    const { accessToken } = response.data;
-    setAccessToken(accessToken);
-    return accessToken;
-  } catch (error: any) {
-    const message = error.response?.data?.message || "Login failed";
-    throw new Error(message);
-  }
-};
+      console.log(response);
 
-export const register = async (
-  username: string,
-  email: string,
-  pass: string,
-  passRepeat: string,
-) => {
-  try {
-    const response = await api.post("/api/auth/register", {
-      username,
-      email,
-      pass: pass,
-      repeatPass: passRepeat,
-    });
-
-    const { accessToken } = response.data;
-    setAccessToken(accessToken);
-    return accessToken;
-  } catch (error: any) {
-    if (error.response?.data?.errors) {
-      throw error.response.data.errors; // { email: "...", username: "..." }
+      const { accessToken } = response.data;
+      setAccessToken(accessToken);
+      return accessToken;
+    } catch (error: any) {
+      const message = error.response?.data || "Login failed";
+      throw new Error(message);
     }
+  };
 
-    const message =
-      error.response?.data || "Registration failed. Please try again.";
-    throw new Error(message);
-  }
-};
+  const apiRegister = async (
+    username: string,
+    email: string,
+    pass: string,
+    passRepeat: string,
+    profileImage?: File,
+  ) => {
+    try {
+      const formData = new FormData();
 
-export const logout = async () => {
-  await api.post("/api/auth/logout");
+      formData.append("username", username);
+      formData.append("email", email);
+      formData.append("pass", pass);
+      formData.append("repeatPass", passRepeat);
 
-  // Clear access token client-side
-  setAccessToken("");
+      if (profileImage) {
+        formData.append("profileImage", profileImage);
+      }
 
-  window.location.href = "/auth/login";
+      const response = await apiWithImage.post("/api/auth/register", formData);
+
+      const { accessToken } = response.data;
+      setAccessToken(accessToken);
+      return accessToken;
+    } catch (error: any) {
+      if (error.response?.data?.errors) {
+        throw error.response.data.errors; // { email: "...", username: "..." }
+      }
+
+      const message =
+        error.response?.data || "Registration failed. Please try again.";
+      throw new Error(message);
+    }
+  };
+
+  const apiLogout = async () => {
+    await api.post("/api/auth/logout");
+    setAccessToken("");
+  };
+
+  return { apiLogin, apiRegister, apiLogout };
 };

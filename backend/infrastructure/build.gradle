@@ -31,6 +31,8 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-websocket'
   implementation 'org.springframework.boot:spring-boot-starter-web'
 
+  implementation group: 'com.github.ua-parser', name: 'uap-java', version: '1.6.1'
+
   compileOnly 'org.projectlombok:lombok:1.18.34'
   annotationProcessor 'org.projectlombok:lombok:1.18.34'
   testCompileOnly 'org.projectlombok:lombok:1.18.34'
@@ -39,6 +41,8 @@ dependencies {
   implementation "org.mapstruct:mapstruct:1.6.2"
   annotationProcessor "org.mapstruct:mapstruct-processor:1.6.2"
 
+  implementation group: 'com.cloudinary', name: 'cloudinary-core', version: '2.3.2'
+  implementation 'com.cloudinary:cloudinary-http5:2.3.2'
 
   testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
@@ -49,7 +53,8 @@ bootRun {
         "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005"
     ]
   }
-systemProperty "spring.profiles.active", "local"
+
+  systemProperty "spring.profiles.active", "local"
 
   def envFile = file(".env.local")
 

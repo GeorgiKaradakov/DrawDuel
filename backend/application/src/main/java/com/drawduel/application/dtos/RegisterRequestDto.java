@@ -18,4 +18,5 @@ public class RegisterRequestDto {
   private String ipAddress;
   private String userAgent;
   private String location;
+  private String osName;
 }

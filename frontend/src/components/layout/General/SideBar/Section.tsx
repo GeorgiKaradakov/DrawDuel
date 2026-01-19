@@ -13,7 +13,7 @@ const Section = ({ className, sectionName, children }: SectionProps) => {
         <p className="text-md text-neutral-500">{sectionName}</p>
       </div>
 
-      <div className="w-full h-fit">{children}</div>
+      <div className="w-full h-fit space-y-2">{children}</div>
     </div>
   );
 };

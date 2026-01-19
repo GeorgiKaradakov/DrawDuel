@@ -24,7 +24,14 @@ public class UserRepositoryImpl implements UserRepository {
     entity.setEmail(user.getEmail());
     entity.setPasswordHash(user.getPassHash());
     entity.setCreatedAt(user.getCreatedAt());
+    entity.setProfileImageUrl(user.getProfileImageUrl());
     userJpaRepository.save(entity);
+  }
+
+  @Override
+  public void updateProfileImageUrl(UUID id, String profileImageUrl) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'updateProfileImageUrl'");
   }
 
   @Override
@@ -53,6 +60,7 @@ public class UserRepositoryImpl implements UserRepository {
         entity.getUsername(),
         entity.getEmail(),
         entity.getPasswordHash(),
-        entity.getCreatedAt());
+        entity.getCreatedAt(),
+        entity.getProfileImageUrl());
   }
 }

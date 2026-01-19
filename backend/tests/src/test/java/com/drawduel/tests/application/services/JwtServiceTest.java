@@ -28,14 +28,14 @@ class JwtServiceTest {
 
   @Test
   void shouldGenerateValidAccessToken() {
-    String token = jwtService.generateToken(userId, username, email);
+    UUID sessionId = UUID.randomUUID();
+    String token = jwtService.generateToken(userId, sessionId);
 
     assertThat(token).isNotNull();
     assertThat(jwtService.isTokenValid(token)).isTrue();
 
     assertThat(jwtService.extractUserId(token)).isEqualTo(userId);
-    assertThat(jwtService.extractUsername(token)).isEqualTo(username);
-    assertThat(jwtService.extractEmail(token)).isEqualTo(email);
+    assertThat(jwtService.extractSessionIdAllowExpired(token)).isEqualTo(sessionId);
   }
 
   @Test
@@ -56,7 +56,7 @@ class JwtServiceTest {
 
   @Test
   void shouldFailValidationForDifferentSecret() {
-    String token = jwtService.generateToken(userId, username, email);
+    String token = jwtService.generateToken(userId, UUID.randomUUID());
     JwtService differentKeyService =
         new JwtService("another_secret_key_987654321_but_it_needs_more_bytes", EXPIRATION_MS);
 

@@ -23,4 +23,5 @@ export interface GenericTableProps<T> {
   data: T[];
   columns: Column<T>[];
   className?: string;
+  tableHeaderClassName?: string;
 }

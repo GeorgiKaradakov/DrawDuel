@@ -4,6 +4,8 @@ import com.drawduel.application.mapper.UserDomainToDtoMapper;
 import com.drawduel.application.mapper.UserSessionDomainToDtoMapper;
 import com.drawduel.application.ports.GetRefreshTokenUseCasePort;
 import com.drawduel.application.ports.GetUserByIdUseCasePort;
+import com.drawduel.application.ports.GetUserInfoUseCasePort;
+import com.drawduel.application.ports.ImageStorageSevicePort;
 import com.drawduel.application.ports.LoginUseCasePort;
 import com.drawduel.application.ports.LogoutUseCasePort;
 import com.drawduel.application.ports.RegisterUseCasePort;
@@ -13,6 +15,7 @@ import com.drawduel.application.services.JwtService;
 import com.drawduel.application.services.TokensService;
 import com.drawduel.application.usecases.GetRefreshTokenUseCase;
 import com.drawduel.application.usecases.GetUserByIdUseCase;
+import com.drawduel.application.usecases.GetUserInfoUseCase;
 import com.drawduel.application.usecases.LoginUseCase;
 import com.drawduel.application.usecases.LogoutUseCase;
 import com.drawduel.application.usecases.RegisterUseCase;
@@ -55,9 +58,20 @@ public class AuthConfig {
   }
 
   @Bean
+  public GetUserInfoUseCasePort getUserInfoUseCase(
+      UserRepositoryImpl userRepo, UserDomainToDtoMapper mapper) {
+    return new GetUserInfoUseCase(userRepo, mapper);
+  }
+
+  @Bean
   public RegisterUseCasePort registerUseCase(
-      UserRepositoryImpl userRepo, BCryptPasswordHasher hasher, TokensService tokenService) {
-    return new RegisterUseCase(userRepo, hasher, tokenService);
+      UserRepositoryImpl userRepo,
+      BCryptPasswordHasher hasher,
+      TokensService tokenService,
+      ImageStorageSevicePort imageStorage,
+      @Value("${DEFAULT_PROFILE_IMAGE_URL}") String defaultProfileImageUrl) {
+    return new RegisterUseCase(
+        userRepo, hasher, tokenService, imageStorage, defaultProfileImageUrl);
   }
 
   @Bean

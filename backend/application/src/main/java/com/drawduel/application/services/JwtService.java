@@ -28,11 +28,10 @@ public class JwtService {
     return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
   }
 
-  public String generateToken(UUID userId, String username, String email) {
+  public String generateToken(UUID userId, UUID sessionId) {
     return Jwts.builder()
         .setSubject(userId.toString())
-        .claim("username", username)
-        .claim("email", email)
+        .claim("sessionId", sessionId.toString())
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
         .signWith(key)
@@ -59,37 +58,15 @@ public class JwtService {
     return UUID.fromString(userId);
   }
 
-  public String extractUsername(String token) {
-    return Jwts.parserBuilder()
-        .setSigningKey(key)
-        .build()
-        .parseClaimsJws(token)
-        .getBody()
-        .get("username", String.class);
-  }
-
-  public String extractEmail(String token) {
-    return Jwts.parserBuilder()
-        .setSigningKey(key)
-        .build()
-        .parseClaimsJws(token)
-        .getBody()
-        .get("email", String.class);
-  }
-
   public UUID extractUserIdAllowExpired(String token) {
     Claims claims = extractAllClaimsAllowExpired(token);
     return UUID.fromString(claims.getSubject());
   }
 
-  public String extractUsernameAllowExpired(String token) {
+  public UUID extractSessionIdAllowExpired(String token) {
     Claims claims = extractAllClaimsAllowExpired(token);
-    return claims.get("username", String.class);
-  }
-
-  public String extractEmailAllowExpired(String token) {
-    Claims claims = extractAllClaimsAllowExpired(token);
-    return claims.get("email", String.class);
+    String sessionId = claims.get("sessionId", String.class);
+    return UUID.fromString(sessionId);
   }
 
   private Claims extractAllClaimsAllowExpired(String token) {

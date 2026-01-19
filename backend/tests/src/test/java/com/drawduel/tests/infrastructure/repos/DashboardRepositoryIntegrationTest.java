@@ -115,6 +115,7 @@ class DashboardRepositoryIntegrationTest extends BaseIntegrationTest {
             username + "@test.com",
             "password123",
             "password123",
+            null,
             "127.0.0.1",
             "JUnit",
             "NL");

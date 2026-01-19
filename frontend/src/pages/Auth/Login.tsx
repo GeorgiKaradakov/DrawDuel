@@ -6,9 +6,10 @@ import { Form } from "@/components/ui/form";
 import FormInput from "@/components/layout/Auth/FormInput";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
-import { login } from "./auth";
+import { useAuth } from "@/context/authProvider/useAuth";
 
 const Login = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -21,11 +22,8 @@ const Login = () => {
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     try {
       await login(values.identifier, values.pass);
-
-      // ✅ user is now authenticated (access token set)
       navigate("/dashboard");
     } catch (err: any) {
-      // If backend gives field errors
       if (typeof err === "object" && !("message" in err)) {
         Object.entries(err).forEach(([field, message]) => {
           form.setError(field as keyof typeof values, {
@@ -48,6 +46,11 @@ const Login = () => {
           className="w-full h-full flex flex-col justify-center items-center space-y-8"
           onSubmit={form.handleSubmit(onSubmit)}
         >
+          {form.formState.errors.root && (
+            <p className="text-2xl text-red-400 font-bold">
+              {form.formState.errors.root.message}
+            </p>
+          )}
           <div className="w-full flex flex-col justify-center items-center space-y-2">
             <FormInput
               formControl={form.control}

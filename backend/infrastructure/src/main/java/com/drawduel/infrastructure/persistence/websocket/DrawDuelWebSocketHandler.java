@@ -2,6 +2,7 @@ package com.drawduel.infrastructure.persistence.websocket;
 
 import com.drawduel.application.dtos.GameDto;
 import com.drawduel.application.ports.CreateGameUseCasePort;
+import com.drawduel.application.ports.GetUserByIdUseCasePort;
 import com.drawduel.application.ports.UpdateGameUseCasePort;
 import com.drawduel.application.services.JwtService;
 import com.drawduel.domain.models.Round;
@@ -26,6 +27,7 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
   private final CreateGameUseCasePort createGameUseCase;
   private final UpdateGameUseCasePort updateGameUseCase;
   private final ObjectMapper mapper = new ObjectMapper();
+  private final GetUserByIdUseCasePort getUserByIdUseCase;
 
   private final Queue<UUID> waitingPlayers = new ConcurrentLinkedQueue<>();
   private final Map<UUID, WebSocketSession> playerSessions = new ConcurrentHashMap<>();
@@ -48,8 +50,12 @@ public class DrawDuelWebSocketHandler extends TextWebSocketHandler {
     }
 
     try {
-      String username = jwtService.extractUsernameAllowExpired(token);
       UUID userId = jwtService.extractUserIdAllowExpired(token);
+      String username =
+          getUserByIdUseCase
+              .handle(new GetUserByIdUseCasePort.Query(userId))
+              .response()
+              .getUsername();
       playerSessions.put(userId, session);
       sessionPlayers.put(session, userId);
       usernames.put(userId, username);
