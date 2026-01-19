@@ -34,7 +34,7 @@ class TokensServiceTest {
   @Test
   void shouldGenerateAccessTokenSuccessfully() {
     UUID userId = UUID.randomUUID();
-    String accessToken = tokensService.generateAccessToken(userId, "guts", "guts@drawduel.com");
+    String accessToken = tokensService.generateAccessToken(userId, UUID.randomUUID());
 
     assertThat(accessToken).isNotNull();
     assertThat(jwtService.isTokenValid(accessToken)).isTrue();
@@ -45,7 +45,8 @@ class TokensServiceTest {
     User user =
         new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hash", Instant.now(), null);
 
-    String[] tokens = tokensService.generateTokens(user, "127.0.0.1", "Mozilla/5.0", "Earth");
+    String[] tokens =
+        tokensService.generateTokens(user, "127.0.0.1", "Mozilla/5.0", "Earth", "Linux");
 
     assertThat(tokens[0]).isNotNull(); // Access token
     assertThat(tokens[1]).isNotNull(); // Refresh token
@@ -57,7 +58,9 @@ class TokensServiceTest {
     UserDto userDto =
         new UserDto(UUID.randomUUID(), "guts", "guts@drawduel.com", Instant.now(), null);
 
-    String[] tokens = tokensService.generateTokens(userDto, "127.0.0.1", "Chrome", "Earth");
+    String[] tokens =
+        tokensService.generateTokens(
+            userDto, UUID.randomUUID(), "127.0.0.1", "Chrome", "Earth", "Linux");
 
     assertThat(tokens[0]).isNotNull();
     assertThat(tokens[1]).isNotNull();
@@ -72,7 +75,8 @@ class TokensServiceTest {
         new User(userId, "guts", "guts@drawduel.com", "hash", Instant.now(), null),
         "127.0.0.1",
         "Chrome",
-        "Earth");
+        "Earth",
+        "Linux");
 
     // Capture argument to check session data
     var captor = org.mockito.ArgumentCaptor.forClass(SaveRefreshTokenUseCasePort.Query.class);

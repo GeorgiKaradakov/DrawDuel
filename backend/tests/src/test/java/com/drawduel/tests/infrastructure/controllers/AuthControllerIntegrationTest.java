@@ -104,10 +104,12 @@ class AuthControllerTest extends BaseIntegrationTest {
         new UserSessionDto(
             UUID.randomUUID(),
             UUID.randomUUID(),
+            UUID.randomUUID(),
             "127.0.0.1",
             "JUnit",
             "unknown",
             "refreshToken123",
+            "Linux",
             false,
             Instant.now(),
             Instant.now().plusSeconds(3600));
@@ -118,7 +120,7 @@ class AuthControllerTest extends BaseIntegrationTest {
     when(getRefreshTokenUseCase.handle(any()))
         .thenReturn(new GetRefreshTokenUseCasePort.Result(session));
     when(getUserByIdUseCase.handle(any())).thenReturn(new GetUserByIdUseCasePort.Result(user));
-    when(tokensService.generateTokens(any(UserDto.class), any(), any(), any()))
+    when(tokensService.generateTokens(any(UserDto.class), any(), any(), any(), any(), any()))
         .thenReturn(new String[] {ACCESS_TOKEN, REFRESH_TOKEN});
 
     mockMvc

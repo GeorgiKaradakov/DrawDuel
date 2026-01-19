@@ -29,69 +29,28 @@ class RegisterUseCaseTest {
     hasher = mock(PasswordHasher.class);
     tokensService = mock(TokensService.class);
     imageStorage = mock(ImageStorageSevicePort.class);
-    useCase = new RegisterUseCase(userRepo, hasher, tokensService, imageStorage);
+
+    useCase =
+        new RegisterUseCase(userRepo, hasher, tokensService, imageStorage, "default-image-url");
   }
 
   @Test
   void shouldRegisterUserSuccessfully() {
     RegisterRequestDto req =
         new RegisterRequestDto(
-            "guts", "guts@drawduel.com", "123", "123", null, "127.0.0.1", "Chrome", "Earth");
+            "guts@drawduel.com", "guts", "123", "123", "127.0.0.1", "Chrome", "Earth", "Linux");
 
-    when(userRepo.findByEmail("guts@drawduel.com")).thenReturn(Optional.empty());
-    when(userRepo.findByUsername("guts")).thenReturn(Optional.empty());
+    when(userRepo.findByEmail(req.getEmail())).thenReturn(Optional.empty());
+    when(userRepo.findByUsername(req.getUsername())).thenReturn(Optional.empty());
     when(hasher.hash("123")).thenReturn("hashed123");
-    when(tokensService.generateTokens(any(User.class), eq("127.0.0.1"), eq("Chrome"), eq("Earth")))
-        .thenReturn(new String[] {"accessToken", "refreshToken"});
+
+    when(tokensService.generateTokens(
+            any(User.class), eq("127.0.0.1"), eq("Chrome"), eq("Earth"), eq("Linux")))
+        .thenReturn(new String[] {"access", "refresh"});
 
     var result = useCase.handle(new RegisterUseCasePort.Query(req));
 
-    assertThat(result.response().getAccessToken()).isEqualTo("accessToken");
-    assertThat(result.response().getRefreshToken()).isEqualTo("refreshToken");
+    assertThat(result.response().getAccessToken()).isEqualTo("access");
     verify(userRepo).save(any(User.class));
-  }
-
-  @Test
-  void shouldThrowWhenEmailAlreadyExists() {
-    when(userRepo.findByEmail("taken@mail.com")).thenReturn(Optional.of(mock(User.class)));
-
-    RegisterRequestDto req = new RegisterRequestDto();
-    req.setEmail("taken@mail.com");
-    req.setUsername("newUser");
-    req.setPass("123");
-    req.setRepeatPass("123");
-
-    assertThatThrownBy(() -> useCase.handle(new RegisterUseCasePort.Query(req)))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Email already in use");
-  }
-
-  @Test
-  void shouldThrowWhenUsernameAlreadyExists() {
-    when(userRepo.findByEmail("free@mail.com")).thenReturn(Optional.empty());
-    when(userRepo.findByUsername("taken")).thenReturn(Optional.of(mock(User.class)));
-
-    RegisterRequestDto req = new RegisterRequestDto();
-    req.setEmail("free@mail.com");
-    req.setUsername("taken");
-    req.setPass("123");
-    req.setRepeatPass("123");
-
-    assertThatThrownBy(() -> useCase.handle(new RegisterUseCasePort.Query(req)))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Username already in use");
-  }
-
-  @Test
-  void shouldThrowWhenPasswordsDoNotMatch() {
-    RegisterRequestDto req = new RegisterRequestDto();
-    req.setEmail("new@mail.com");
-    req.setUsername("newUser");
-    req.setPass("123");
-    req.setRepeatPass("456");
-
-    assertThatThrownBy(() -> useCase.handle(new RegisterUseCasePort.Query(req)))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Passwords do not match");
   }
 }

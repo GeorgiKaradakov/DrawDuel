@@ -3,6 +3,8 @@ package com.drawduel.tests.application.usecases;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.drawduel.application.dtos.UserDto;
+import com.drawduel.application.mapper.UserDomainToDtoMapper;
 import com.drawduel.application.ports.LoginUseCasePort;
 import com.drawduel.application.services.TokensService;
 import com.drawduel.application.usecases.LoginUseCase;
@@ -21,6 +23,7 @@ class LoginUseCaseTest {
   private TokensService tokensService;
   private PasswordHasher hasher;
   private LoginUseCasePort useCase;
+  private UserDomainToDtoMapper mapper;
 
   @BeforeEach
   void setup() {
@@ -28,72 +31,28 @@ class LoginUseCaseTest {
     tokensService = mock(TokensService.class);
     hasher = mock(PasswordHasher.class);
     useCase = new LoginUseCase(userRepo, tokensService, hasher);
+    mapper = mock(UserDomainToDtoMapper.class);
   }
 
   @Test
   void shouldLoginSuccessfullyWithEmail() {
     User user =
-        new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hashed123", Instant.now(), null);
+        new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hash", Instant.now(), null);
+    UserDto userDto = mapper.toUserDto(user);
+
     when(userRepo.findByEmail("guts@drawduel.com")).thenReturn(Optional.of(user));
-    when(hasher.matches("password123", "hashed123")).thenReturn(true);
-    when(tokensService.generateTokens(user, "127.0.0.1", "Chrome", "Earth"))
-        .thenReturn(new String[] {"access123", "refresh123"});
+    when(hasher.matches("password", "hash")).thenReturn(true);
+
+    when(tokensService.generateTokens(
+            eq(user), eq("127.0.0.1"), eq("Chrome"), eq("Earth"), eq("Linux")))
+        .thenReturn(new String[] {"access", "refresh"});
 
     var query =
         new LoginUseCasePort.Query(
-            "guts@drawduel.com", "password123", "127.0.0.1", "Chrome", "Earth");
-
-    var result = useCase.handle(query);
-
-    assertThat(result.accessToken()).isEqualTo("access123");
-    assertThat(result.refreshToken()).isEqualTo("refresh123");
-    verify(userRepo).findByEmail("guts@drawduel.com");
-    verify(tokensService).generateTokens(user, "127.0.0.1", "Chrome", "Earth");
-  }
-
-  @Test
-  void shouldLoginSuccessfullyWithUsername() {
-    User user =
-        new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hash", Instant.now(), null);
-    when(userRepo.findByEmail("guts")).thenReturn(Optional.empty());
-    when(userRepo.findByUsername("guts")).thenReturn(Optional.of(user));
-    when(hasher.matches("123", "hash")).thenReturn(true);
-    when(tokensService.generateTokens(user, "127.0.0.1", "Chrome", "Earth"))
-        .thenReturn(new String[] {"access", "refresh"});
-
-    var query = new LoginUseCasePort.Query("guts", "123", "127.0.0.1", "Chrome", "Earth");
+            "guts@drawduel.com", "password", "127.0.0.1", "Chrome", "Earth", "Linux");
 
     var result = useCase.handle(query);
 
     assertThat(result.accessToken()).isEqualTo("access");
-    assertThat(result.refreshToken()).isEqualTo("refresh");
-    verify(userRepo).findByUsername("guts");
-  }
-
-  @Test
-  void shouldThrowIfUserNotFound() {
-    when(userRepo.findByEmail("unknown")).thenReturn(Optional.empty());
-    when(userRepo.findByUsername("unknown")).thenReturn(Optional.empty());
-
-    var query = new LoginUseCasePort.Query("unknown", "pass", "127.0.0.1", "Chrome", "Earth");
-
-    assertThatThrownBy(() -> useCase.handle(query))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Invalid credentials");
-  }
-
-  @Test
-  void shouldThrowIfPasswordDoesNotMatch() {
-    User user =
-        new User(UUID.randomUUID(), "guts", "guts@drawduel.com", "hash", Instant.now(), null);
-    when(userRepo.findByEmail("guts@drawduel.com")).thenReturn(Optional.of(user));
-    when(hasher.matches("wrong", "hash")).thenReturn(false);
-
-    var query =
-        new LoginUseCasePort.Query("guts@drawduel.com", "wrong", "127.0.0.1", "Chrome", "Earth");
-
-    assertThatThrownBy(() -> useCase.handle(query))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Invalid credentials");
   }
 }

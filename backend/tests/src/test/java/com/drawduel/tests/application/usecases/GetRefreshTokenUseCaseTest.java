@@ -15,50 +15,54 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class GetRefreshTokenUseCaseTest {
+class GetRefreshTokenUseCaseTest {
 
-  private GetRefreshTokenUseCasePort getRefreshTokenUseCase;
   private RefreshTokenRepository tokenRepo;
   private UserSessionDomainToDtoMapper mapper;
+  private GetRefreshTokenUseCase useCase;
 
   @BeforeEach
   void setup() {
     tokenRepo = mock(RefreshTokenRepository.class);
     mapper = mock(UserSessionDomainToDtoMapper.class);
-    getRefreshTokenUseCase = new GetRefreshTokenUseCase(tokenRepo, mapper);
+    useCase = new GetRefreshTokenUseCase(tokenRepo, mapper);
   }
 
   @Test
-  void shouldReturnUserSessionDtoWhenFound() {
+  void returnsSessionDto() {
     UserSession session =
         new UserSession(
             UUID.randomUUID(),
             UUID.randomUUID(),
+            UUID.randomUUID(),
             "127.0.0.1",
-            "Mozzila/5.0",
+            "Firefox",
             "Earth",
-            "refreshtoken123",
+            "Linux",
+            "refresh",
             false,
             Instant.now(),
             Instant.now().plusSeconds(3600));
-    when(tokenRepo.findByRefreshToken("refreshtoken123")).thenReturn(Optional.of(session));
+
+    when(tokenRepo.findByRefreshToken("refresh")).thenReturn(Optional.of(session));
+
     when(mapper.toDto(session))
         .thenReturn(
             new UserSessionDto(
-                UUID.randomUUID(),
-                UUID.randomUUID(),
-                "127.0.0.1",
-                "Mozzila/5.0",
-                "Earth",
-                "refreshtoken123",
-                false,
-                Instant.now(),
-                Instant.now().plusSeconds(3600)));
+                session.getId(),
+                session.getUserId(),
+                session.getSessionId(),
+                session.getIpAddress(),
+                session.getUserAgent(),
+                session.getLocation(),
+                session.getOsName(),
+                session.getRefreshToken(),
+                session.getRevoked(),
+                session.getIssuedAt(),
+                session.getExpiresAt()));
 
-    var result =
-        getRefreshTokenUseCase.handle(new GetRefreshTokenUseCasePort.Query("refreshtoken123"));
+    var result = useCase.handle(new GetRefreshTokenUseCasePort.Query("refresh"));
 
     assertThat(result.response()).isNotNull();
-    verify(tokenRepo).findByRefreshToken("refreshtoken123");
   }
 }

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest 
 
   private RefreshTokenRepositoryImpl refreshTokenRepository;
   private UUID userId;
+  private UUID sessionId;
 
   @BeforeEach
   void setup() {
@@ -39,6 +41,7 @@ public class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest 
 
     // Prepare test user
     userId = UUID.randomUUID();
+    sessionId = UUID.randomUUID();
     JpaUserEntity user = new JpaUserEntity();
     user.setId(userId);
     user.setUsername("testuser");
@@ -58,9 +61,11 @@ public class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest 
         new UserSession(
             UUID.randomUUID(),
             userId,
+            sessionId,
             "127.0.0.1",
             "JUnit",
             "Earth",
+            "Linux",
             refreshToken,
             false,
             Instant.now(),
@@ -72,6 +77,7 @@ public class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest 
     assertThat(found).isPresent();
     assertThat(found.get().getRefreshToken()).isEqualTo(refreshToken);
     assertThat(found.get().getUserId()).isEqualTo(userId);
+    assertThat(found.get().getSessionId()).isEqualTo(sessionId);
   }
 
   @Test
@@ -82,15 +88,18 @@ public class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest 
         new UserSession(
             UUID.randomUUID(),
             fakeUserId,
+            sessionId,
             "127.0.0.1",
             "JUnit",
             "Earth",
+            "Linux",
             "invalidtoken",
             false,
             Instant.now(),
             Instant.now().plusSeconds(3600));
 
-    assertThrows(IllegalArgumentException.class, () -> refreshTokenRepository.save(session));
+    assertThrows(
+        JpaObjectRetrievalFailureException.class, () -> refreshTokenRepository.save(session));
   }
 
   @Test
@@ -102,9 +111,11 @@ public class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest 
         new UserSession(
             UUID.randomUUID(),
             userId,
+            sessionId,
             "127.0.0.1",
             "JUnit",
             "Mars",
+            "Linux",
             refreshToken,
             false,
             Instant.now(),

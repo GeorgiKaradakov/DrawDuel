@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SaveRefreshTokenUseCaseTest {
+
   private RefreshTokenRepository tokenRepo;
   private SaveRefreshTokenUseCasePort useCase;
 
@@ -22,21 +23,23 @@ class SaveRefreshTokenUseCaseTest {
   }
 
   @Test
-  void shouldSaveTokenToRepo() {
+  void shouldSaveToken() {
     UserSession session =
         new UserSession(
             UUID.randomUUID(),
             UUID.randomUUID(),
+            UUID.randomUUID(),
             "127.0.0.1",
-            "Mozilla/5.0",
+            "Firefox",
             "Earth",
-            "refresh",
+            "Linux",
+            "refresh-token",
             false,
             Instant.now(),
             Instant.now().plusSeconds(3600));
 
     useCase.handle(new SaveRefreshTokenUseCase.Query(session));
 
-    verify(tokenRepo, times(1)).save(session);
+    verify(tokenRepo).save(session);
   }
 }
