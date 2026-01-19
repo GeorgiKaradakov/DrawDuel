@@ -1,6 +1,7 @@
 import { useAuth } from "@/context/authProvider/useAuth";
 import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router";
+import { Toaster } from "../ui/sonner";
 
 export default function ProtectedRoute() {
   const { isAuthenticated, loading, initAuth } = useAuth();
@@ -15,5 +16,10 @@ export default function ProtectedRoute() {
     return <Navigate to="/auth/login" replace />;
   }
 
-  return <Outlet />;
+  return (
+    <div>
+      <Toaster />
+      <Outlet />
+    </div>
+  );
 }

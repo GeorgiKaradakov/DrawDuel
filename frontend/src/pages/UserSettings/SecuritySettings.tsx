@@ -6,8 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type z from "zod";
 import { updatePassword } from "./server";
+import { useState } from "react";
+import { Spinner } from "@/components/layout/General/Spinner";
+import { errorToast, successToast } from "@/lib/toast";
 
 const SecuritySettings = () => {
+  const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof securitySettingsSchema>>({
     resolver: zodResolver(securitySettingsSchema),
     defaultValues: {
@@ -17,12 +22,22 @@ const SecuritySettings = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof securitySettingsSchema>) => {
-    await updatePassword(values.currentPass, values.newPass).catch((error) => {
+    try {
+      setLoading(true);
+      await updatePassword(values.currentPass, values.newPass).then(() => {
+        successToast("Password updated successfully!");
+      });
+      form.reset();
+    } catch (error: any) {
       const errorMsg: string = error.response?.data;
-      if (errorMsg.includes("password")) {
+      if (errorMsg?.includes("password")) {
         form.setError("currentPass", { message: errorMsg });
+      } else {
+        errorToast("Failed to update password.");
       }
-    });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,9 +78,10 @@ const SecuritySettings = () => {
           <Button
             variant="default"
             type="submit"
-            className="p-4 text-md font-bold bg-indigo-500 hover:bg-indigo-400"
+            disabled={loading}
+            className="p-4 text-md font-bold bg-indigo-500 hover:bg-indigo-400 min-w-[180px]"
           >
-            Change Password
+            {loading ? <Spinner /> : "Change Password"}
           </Button>
         </form>
       </div>

@@ -1,41 +1,18 @@
 import { api, apiWithImage } from "@/lib/axios";
 
 export const updateUsername = async (username: string) => {
-  await api
-    .patch("/api/user/update-username", { value: username })
-    .then((response) => {
-      console.log(response);
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  return await api.patch("/api/user/update-username", { value: username });
 };
 
 export const updateEmail = async (email: string) => {
-  await api
-    .patch("/api/user/update-email", { value: email })
-    .then((response) => {
-      console.log(response);
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  return await api.patch("/api/user/update-email", { value: email });
 };
 
 export const updateProfileImage = async (file: File) => {
   const formData = new FormData();
   formData.append("profileImage", file);
 
-  await apiWithImage
-    .post("/api/user/update-profile-image", formData)
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  return await apiWithImage.post("/api/user/update-profile-image", formData);
 };
 
 export const updatePassword = async (currentPass: string, newPass: string) => {

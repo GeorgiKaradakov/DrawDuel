@@ -8,6 +8,8 @@ import {
   updateProfileImage,
   updateUsername,
 } from "@/pages/UserSettings/server";
+import { Spinner } from "../General/Spinner";
+import { errorToast, successToast } from "@/lib/toast";
 
 const UserProperty = ({
   className,
@@ -28,11 +30,23 @@ const UserProperty = ({
 
       switch (title) {
         case "Username":
-          await updateUsername(updatedContent);
+          await updateUsername(updatedContent)
+            .then(() => {
+              successToast("Username updated successfully!");
+            })
+            .catch((error) => {
+              errorToast(error.response?.data || "Failed to update username.");
+            });
           break;
 
         case "Email":
-          await updateEmail(updatedContent);
+          await updateEmail(updatedContent)
+            .then(() => {
+              successToast("Email updated successfully!");
+            })
+            .catch((error) => {
+              errorToast(error.response?.data || "Failed to update email.");
+            });
           break;
 
         default:
@@ -45,15 +59,21 @@ const UserProperty = ({
 
   const handleImageChange = async (file: File) => {
     setLoading(true);
-    await updateProfileImage(file).finally(() => {
-      setLoading(false);
-    });
+    await updateProfileImage(file)
+      .then(() => {
+        successToast("Profile image updated successfully!");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const handleImageRemove = async () => {
     try {
       setLoading(true);
-      await api.delete("/api/user/profile-image");
+      await api.delete("/api/user/profile-image").then(() => {
+        successToast("Profile image removed successfully!");
+      });
     } finally {
       setLoading(false);
     }
@@ -104,16 +124,17 @@ const UserProperty = ({
               variant="destructive"
               onClick={handleImageRemove}
               disabled={loading}
+              className="min-w-[140px]"
             >
-              Remove Image
+              {loading ? <Spinner /> : "Remove Image"}
             </Button>
 
             <Button
               onClick={() => fileInputRef.current?.click()}
               disabled={loading}
-              className="bg-indigo-500 hover:bg-indigo-400"
+              className="bg-indigo-500 hover:bg-indigo-400 min-w-[140px]"
             >
-              Change Image
+              {loading ? <Spinner /> : "Change Image"}
             </Button>
           </>
         )}
@@ -122,9 +143,9 @@ const UserProperty = ({
           <Button
             onClick={handleTextSubmit}
             disabled={loading || updatedContent === content}
-            className="bg-indigo-500 hover:bg-indigo-400"
+            className="bg-indigo-500 hover:bg-indigo-400 min-w-[140px]"
           >
-            Save Changes
+            {loading ? <Spinner /> : "Save Changes"}
           </Button>
         )}
       </div>

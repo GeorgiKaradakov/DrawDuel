@@ -21,7 +21,10 @@ export interface DeviceManagementRow {
   // action: string;
 }
 
-export const DeviceManagementColumns: Column<DeviceManagementRow>[] = [
+export const DeviceManagementColumns = (
+  onRevoke: (sessionId: string) => Promise<void>,
+  revokingSessionId: string | null,
+): Column<DeviceManagementRow>[] => [
   {
     key: "osName",
     label: "Operating System",
@@ -43,7 +46,6 @@ export const DeviceManagementColumns: Column<DeviceManagementRow>[] = [
     className: "text-md font-semibold",
     render: (value) => {
       const status = String(value).toLowerCase().replace("_", " ");
-
       const colorMap: Record<string, string> = {
         active: "text-emerald-400",
         "current session": "text-sky-400",
@@ -63,17 +65,18 @@ export const DeviceManagementColumns: Column<DeviceManagementRow>[] = [
         return <span className="text-neutral-400">—</span>;
       }
 
+      const isLoading = revokingSessionId === row.sessionId;
+      const disableAll = revokingSessionId !== null;
+
       return (
         <Button
           variant="destructive"
           size="sm"
-          onClick={async () => {
-            await revokeDevice(row.sessionId).catch((error) => {
-              console.log(error);
-            });
-          }}
+          disabled={disableAll}
+          className="min-w-[90px]"
+          onClick={() => onRevoke(row.sessionId)}
         >
-          Revoke
+          {isLoading ? <span className="animate-spin">⏳</span> : "Revoke"}
         </Button>
       );
     },

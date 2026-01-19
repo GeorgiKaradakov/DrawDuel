@@ -54,12 +54,10 @@ const SettingsSidebar = () => {
 
   return (
     <aside className="w-100 h-full flex flex-col items-center border-r border-neutral-600">
-      {/* Header */}
       <div className="w-full h-20 flex justify-center items-center">
         <p className="text-4xl text-neutral-50 font-bold">Settings</p>
       </div>
 
-      {/* Navigation */}
       <div className="w-full flex-1 space-y-6 px-2">
         {profileSections.map(({ id: sectionId, name }) => (
           <Section key={sectionId} sectionName={name} className="space-y-2">
