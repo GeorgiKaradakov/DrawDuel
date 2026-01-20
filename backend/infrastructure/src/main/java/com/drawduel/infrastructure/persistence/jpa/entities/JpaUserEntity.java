@@ -32,7 +32,7 @@ public class JpaUserEntity {
   @Column(name = "created_at", nullable = false)
   private Instant createdAt;
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "user")
   @JsonIgnore
   private List<JpaTokensEntity> tokens = new ArrayList<>();
 }

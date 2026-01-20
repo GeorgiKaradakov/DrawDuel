@@ -58,7 +58,6 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
 
   @Override
   public void deleteByUserId(UUID userId) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'deleteByUserId'");
+    tokensJpaRepository.deleteAllByUserId(userId);
   }
 }

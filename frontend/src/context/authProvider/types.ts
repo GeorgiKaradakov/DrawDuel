@@ -18,7 +18,7 @@ export type AuthContextType = {
     profileImage?: File,
   ) => Promise<void>;
   logout: () => void;
-  setUser: (user: AuthUser | null) => void;
+  updateUser: (updatedUser: Partial<AuthUser>) => void;
   initAuth: () => Promise<void>;
 };
 

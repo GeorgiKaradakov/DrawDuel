@@ -15,6 +15,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       const res = await api.get<AuthUser>("/api/auth/me");
       setUser(res.data);
+      console.log(res.data);
     } catch {
       setUser(null);
     } finally {
@@ -40,6 +41,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(res.data);
   };
 
+  const updateUser = (updatedUser: Partial<AuthUser>) => {
+    setUser((prevUser) => {
+      if (!prevUser) return prevUser;
+      return { ...prevUser, ...updatedUser };
+    });
+  };
+
   const logout = async () => {
     try {
       await apiLogout();
@@ -62,7 +70,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         login,
         register,
         logout,
-        setUser,
+        updateUser,
         initAuth,
       }}
     >
