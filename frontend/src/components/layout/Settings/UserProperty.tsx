@@ -76,12 +76,15 @@ const UserProperty = ({
   const handleImageRemove = async () => {
     try {
       setLoading(true);
-      await api.delete("/api/user/delete-profile-image").then((result) => {
-        successToast("Profile image removed successfully!");
-        updateUser({ profileImageUrl: result?.data });
-      });
-    } catch (err) {
-      errorToast(err.response?.data || "Failed to remove profile image.");
+      await api
+        .delete("/api/user/delete-profile-image")
+        .then((result) => {
+          successToast("Profile image removed successfully!");
+          updateUser({ profileImageUrl: result?.data });
+        })
+        .catch((error) => {
+          errorToast(error.response?.data || "Failed to remove profile image.");
+        });
     } finally {
       setLoading(false);
     }
