@@ -10,6 +10,7 @@ import {
 } from "@/pages/UserSettings/server";
 import { Spinner } from "../General/Spinner";
 import { errorToast, successToast } from "@/lib/toast";
+import { useAuth } from "@/context/authProvider/useAuth";
 
 const UserProperty = ({
   className,
@@ -17,6 +18,7 @@ const UserProperty = ({
   content,
   isImage,
 }: UserPropertyProps) => {
+  const { updateUser } = useAuth();
   const [updatedContent, setUpdatedContent] = useState(content);
   const [loading, setLoading] = useState(false);
 
@@ -33,6 +35,7 @@ const UserProperty = ({
           await updateUsername(updatedContent)
             .then(() => {
               successToast("Username updated successfully!");
+              updateUser({ username: updatedContent });
             })
             .catch((error) => {
               errorToast(error.response?.data || "Failed to update username.");
@@ -43,6 +46,7 @@ const UserProperty = ({
           await updateEmail(updatedContent)
             .then(() => {
               successToast("Email updated successfully!");
+              updateUser({ email: updatedContent });
             })
             .catch((error) => {
               errorToast(error.response?.data || "Failed to update email.");
@@ -62,6 +66,7 @@ const UserProperty = ({
     await updateProfileImage(file)
       .then(() => {
         successToast("Profile image updated successfully!");
+        updateUser({ profileImageUrl: URL.createObjectURL(file) });
       })
       .finally(() => {
         setLoading(false);
@@ -71,9 +76,15 @@ const UserProperty = ({
   const handleImageRemove = async () => {
     try {
       setLoading(true);
-      await api.delete("/api/user/profile-image").then(() => {
-        successToast("Profile image removed successfully!");
-      });
+      await api
+        .delete("/api/user/delete-profile-image")
+        .then((result) => {
+          successToast("Profile image removed successfully!");
+          updateUser({ profileImageUrl: result?.data });
+        })
+        .catch((error) => {
+          errorToast(error.response?.data || "Failed to remove profile image.");
+        });
     } finally {
       setLoading(false);
     }

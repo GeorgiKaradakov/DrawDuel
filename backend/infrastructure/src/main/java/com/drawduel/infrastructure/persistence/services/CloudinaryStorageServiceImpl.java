@@ -41,6 +41,22 @@ public class CloudinaryStorageServiceImpl implements ImageStorageSevicePort {
     }
   }
 
+  @Override
+  public void deleteProfileImage(String imageUrl) {
+    String publicId = extractPublicId(imageUrl);
+
+    if (publicId == null) {
+      return;
+    }
+
+    try {
+      cloudinary.uploader().destroy(publicId, Map.of("invalidate", true));
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new IllegalStateException("Failed to delete profile image", e);
+    }
+  }
+
   private void validate(byte[] imageBytes, UUID userId) {
     if (userId == null) {
       throw new IllegalArgumentException("User id must be provided");
@@ -53,5 +69,18 @@ public class CloudinaryStorageServiceImpl implements ImageStorageSevicePort {
     if (imageBytes.length > MAX_IMAGE_SIZE_BYTES) {
       throw new IllegalArgumentException("Image exceeds maximum size of 2MB");
     }
+  }
+
+  public String extractPublicId(String imageUrl) {
+    if (imageUrl == null || imageUrl.isBlank()) {
+      return null;
+    }
+
+    String cleanUrl = imageUrl.split("\\?")[0];
+    String afterUpload = cleanUrl.substring(cleanUrl.indexOf("/upload/") + 8);
+
+    afterUpload = afterUpload.replaceFirst("^v\\d+/", "");
+
+    return afterUpload.replaceFirst("\\.[^.]+$", "");
   }
 }

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.drawduel.application.ports.DeleteAccountUseCasePort;
 import com.drawduel.application.usecases.DeleteAccountUseCase;
 import com.drawduel.domain.models.User;
+import com.drawduel.domain.ports.RefreshTokenRepository;
 import com.drawduel.domain.ports.UserRepository;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,12 +16,14 @@ import org.junit.jupiter.api.Test;
 class DeleteAccountUseCaseTest {
 
   private UserRepository userRepository;
+  private RefreshTokenRepository refreshTokenRepository;
   private DeleteAccountUseCase useCase;
 
   @BeforeEach
   void setup() {
     userRepository = mock(UserRepository.class);
-    useCase = new DeleteAccountUseCase(userRepository);
+    refreshTokenRepository = mock(RefreshTokenRepository.class);
+    useCase = new DeleteAccountUseCase(userRepository, refreshTokenRepository);
   }
 
   @Test

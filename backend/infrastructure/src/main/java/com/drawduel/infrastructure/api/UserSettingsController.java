@@ -5,6 +5,7 @@ import com.drawduel.application.dtos.DevicesResponseDto;
 import com.drawduel.application.dtos.UpdateUserDetailsRequestDto;
 import com.drawduel.application.ports.ChangePasswordUseCasePort;
 import com.drawduel.application.ports.DeleteAccountUseCasePort;
+import com.drawduel.application.ports.DeleteProfileImageUseCasePort;
 import com.drawduel.application.ports.GetProfileUseCasePort;
 import com.drawduel.application.ports.GetSessionInfoUseCasePort;
 import com.drawduel.application.ports.RevokeSessionUseCasePort;
@@ -31,6 +32,7 @@ public class UserSettingsController {
   private final JwtService jwtService;
   private final GetProfileUseCasePort getProfileUseCase;
   private final GetSessionInfoUseCasePort getSessionInfoUseCase;
+  private final DeleteProfileImageUseCasePort deleteProfileImageUseCase;
 
   @PatchMapping("/update-username")
   public ResponseEntity<?> updateUsername(
@@ -126,6 +128,18 @@ public class UserSettingsController {
         new RevokeSessionUseCasePort.Query(userId, sessionId, currentSessionId));
 
     return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/delete-profile-image")
+  public ResponseEntity<?> deleteProfileImage(@RequestHeader("Authorization") String authHeader) {
+    UUID userId = jwtService.extractUserId(authHeader.substring(7));
+
+    String result =
+        deleteProfileImageUseCase
+            .handle(new DeleteProfileImageUseCasePort.Query(userId))
+            .profileImageUrl();
+
+    return ResponseEntity.ok(result);
   }
 
   @DeleteMapping("/delete-account")

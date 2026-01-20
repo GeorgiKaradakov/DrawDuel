@@ -18,10 +18,10 @@ public interface TokensJpaRepository extends JpaRepository<JpaTokensEntity, UUID
 
   Optional<JpaTokensEntity> findByUserId(UUID userId);
 
-  // @Transactional
-  // @Modifying
-  // @Query("DELETE FROM JpaTokensEntity t WHERE t.userId = :userId")
-  // void deleteByUserId(UUID userId);
+  @Transactional
+  @Modifying
+  @Query("DELETE FROM JpaTokensEntity t WHERE t.user.id = :userId")
+  void deleteAllByUserId(UUID userId);
 
   @Query(
       """
