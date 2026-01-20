@@ -61,6 +61,7 @@ const SecuritySettings = () => {
               type="password"
               putPasVisibilityToggle={true}
               placeholder="current password ..."
+              data_cy="current-password-input"
               description="The password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol!"
             />
 
@@ -71,6 +72,7 @@ const SecuritySettings = () => {
               type="password"
               putPasVisibilityToggle={true}
               placeholder="new password ..."
+              data_cy="new-password-input"
               description="The password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol!"
             />
           </div>
@@ -79,6 +81,7 @@ const SecuritySettings = () => {
             variant="default"
             type="submit"
             disabled={loading}
+            data-cy="change-password-button"
             className="p-4 text-md font-bold bg-indigo-500 hover:bg-indigo-400 min-w-[180px]"
           >
             {loading ? <Spinner /> : "Change Password"}

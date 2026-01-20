@@ -24,6 +24,7 @@ function FormInput<T extends FieldValues>({
   putPasVisibilityToggle,
   className,
   inputClassName,
+  data_cy,
 }: FormInputProps<T>) {
   const [showPass, setShowPass] = useState(false);
   const inputType =
@@ -47,6 +48,7 @@ function FormInput<T extends FieldValues>({
                         type={inputType}
                         placeholder={placeholder}
                         disabled={!valid}
+                        data-cy={data_cy}
                         className={cn(
                           "w-full h-full p-2 pl-5 rounded-sm bg-neutral-800 focus:outline-none",
                           inputClassName,
@@ -76,6 +78,7 @@ function FormInput<T extends FieldValues>({
                       type={inputType}
                       placeholder={placeholder}
                       disabled={!valid}
+                      data-cy={data_cy}
                       className={cn(
                         "w-full h-full p-2 pl-5 rounded-sm bg-neutral-800 focus:outline-none",
                         inputClassName,
@@ -91,10 +94,10 @@ function FormInput<T extends FieldValues>({
               <div className="flex justify-start items-center space-x-2">
                 <FormControl>
                   <Checkbox
-                    // data-cy={props["data-cy"]}
                     checked={field.value}
                     onCheckedChange={field.onChange}
                     className={cn(inputClassName, "")}
+                    data-cy={data_cy}
                     disabled={!valid}
                   />
                 </FormControl>

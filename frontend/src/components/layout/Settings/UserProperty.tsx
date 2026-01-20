@@ -113,6 +113,7 @@ const UserProperty = ({
         <input
           className="px-5 text-lg text-neutral-50 font-semibold border border-neutral-600 bg-neutral-800 p-2 rounded-md w-2/5 outline-none"
           value={updatedContent}
+          data-cy={"change-" + title + "-input"}
           onChange={(e) => setUpdatedContent(e.target.value)}
         />
       )}
@@ -154,6 +155,7 @@ const UserProperty = ({
           <Button
             onClick={handleTextSubmit}
             disabled={loading || updatedContent === content}
+            data-cy={"change-" + title + "-submit"}
             className="bg-indigo-500 hover:bg-indigo-400 min-w-[140px]"
           >
             {loading ? <Spinner /> : "Save Changes"}

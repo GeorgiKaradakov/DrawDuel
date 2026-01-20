@@ -5,6 +5,7 @@ const SectionContent = ({
   className,
   name,
   icon,
+  data_cy,
   handleOnClick,
 }: SectionContentProps) => {
   return (
@@ -13,6 +14,7 @@ const SectionContent = ({
         "px-3 py-1 ml-10 w-fit h-fit flex justify-start items-start rounded-lg hover:bg-neutral-600 hover:cursor-pointer",
         className,
       )}
+      data-cy={data_cy}
       onClick={handleOnClick}
     >
       {icon && icon}

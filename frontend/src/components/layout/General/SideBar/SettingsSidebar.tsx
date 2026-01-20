@@ -66,6 +66,7 @@ const SettingsSidebar = () => {
                 key={id}
                 name={name}
                 icon={<Icon className="text-neutral-50" />}
+                data_cy={"settings-sidebar-" + id}
                 className={cn(
                   "ml-10 space-x-7 transition-all duration-200",
                   isActive(id)

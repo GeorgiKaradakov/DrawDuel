@@ -10,6 +10,7 @@ export interface SectionContentProps {
   className?: string;
   name: string;
   icon?: ReactNode;
+  data_cy?: string;
   handleOnClick: () => void;
 }
 

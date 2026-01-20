@@ -12,7 +12,7 @@ export type FormInputProps<T extends FieldValues> = {
   putPasVisibilityToggle?: boolean;
   className?: string;
   inputClassName?: string;
-  "data-cy"?: string;
+  data_cy?: string;
 };
 
 export type FormDescriptionToolTipProps = {

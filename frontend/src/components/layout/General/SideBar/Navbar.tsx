@@ -55,6 +55,7 @@ const Navbar = () => {
                   className={`${isActive ? "bg-indigo-500" : ""}`}
                   key={contentId}
                   name={name}
+                  data_cy={"navbar-" + contentId}
                   handleOnClick={() => {
                     navigate(resolvedUrl);
                   }}

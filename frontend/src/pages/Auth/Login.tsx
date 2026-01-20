@@ -57,6 +57,7 @@ const Login = () => {
               name="identifier"
               label="Username or Email:"
               placeholder="username or email ..."
+              data_cy="login-identifier-input"
               className="w-4/5 text-lg"
             />
 
@@ -67,6 +68,7 @@ const Login = () => {
               type="password"
               putPasVisibilityToggle={true}
               placeholder="password ..."
+              data_cy="login-password-input"
               className="w-4/5 text-md"
               description="The password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol!"
             />
