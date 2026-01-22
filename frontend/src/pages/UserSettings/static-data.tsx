@@ -64,6 +64,7 @@ export const DeviceManagementColumns = (
         return <span className="text-neutral-400">—</span>;
       }
 
+      const isCurrentSession = row.status === "CURRENT_SESSION";
       const isLoading = revokingSessionId === row.sessionId;
       const disableAll = revokingSessionId !== null;
 
@@ -73,6 +74,11 @@ export const DeviceManagementColumns = (
           size="sm"
           disabled={disableAll}
           className="min-w-[90px]"
+          data-cy={
+            isCurrentSession
+              ? "revoke-session-button-current-session"
+              : "revoke-session-button"
+          }
           onClick={() => onRevoke(row.sessionId)}
         >
           {isLoading ? <span className="animate-spin">⏳</span> : "Revoke"}

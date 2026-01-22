@@ -113,6 +113,7 @@ const UserProperty = ({
         <input
           className="px-5 text-lg text-neutral-50 font-semibold border border-neutral-600 bg-neutral-800 p-2 rounded-md w-2/5 outline-none"
           value={updatedContent}
+          data-cy={"change-" + title + "-input"}
           onChange={(e) => setUpdatedContent(e.target.value)}
         />
       )}
@@ -125,6 +126,7 @@ const UserProperty = ({
               type="file"
               hidden
               accept="image/*"
+              data-cy="change-profile-image-input"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleImageChange(file);
@@ -136,6 +138,7 @@ const UserProperty = ({
               onClick={handleImageRemove}
               disabled={loading}
               className="min-w-[140px]"
+              data-cy="remove-profile-image-button"
             >
               {loading ? <Spinner /> : "Remove Image"}
             </Button>
@@ -144,6 +147,7 @@ const UserProperty = ({
               onClick={() => fileInputRef.current?.click()}
               disabled={loading}
               className="bg-indigo-500 hover:bg-indigo-400 min-w-[140px]"
+              data-cy="change-profile-image-button"
             >
               {loading ? <Spinner /> : "Change Image"}
             </Button>
@@ -154,6 +158,7 @@ const UserProperty = ({
           <Button
             onClick={handleTextSubmit}
             disabled={loading || updatedContent === content}
+            data-cy={"change-" + title + "-submit"}
             className="bg-indigo-500 hover:bg-indigo-400 min-w-[140px]"
           >
             {loading ? <Spinner /> : "Save Changes"}

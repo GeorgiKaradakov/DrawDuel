@@ -46,6 +46,7 @@ const UserSettings = () => {
         <Button
           variant="destructive"
           className="text-xl text-neutral-50 font-bold"
+          data-cy="delete-profile-button"
           onClick={async () => {
             await deleteAccount();
             setAccessToken("");

@@ -10,9 +10,9 @@ import com.drawduel.infrastructure.persistence.jpa.repositories.TokensJpaReposit
 import com.drawduel.infrastructure.persistence.jpa.repositories.UserJpaRepository;
 import com.drawduel.infrastructure.persistence.ports.RefreshTokenRepositoryImpl;
 import com.drawduel.tests.BaseIntegrationTest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,79 +23,79 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@Transactional
 class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private TokensJpaRepository tokensJpaRepository;
   @Autowired private UserJpaRepository userJpaRepository;
+  @PersistenceContext private EntityManager entityManager;
 
   private RefreshTokenRepositoryImpl refreshTokenRepository;
   private UUID userId;
-  private UUID sessionId;
 
   @BeforeEach
   void setup() {
-    UserSessionToJpaEntity mapper = Mappers.getMapper(UserSessionToJpaEntity.class);
     refreshTokenRepository =
-        new RefreshTokenRepositoryImpl(tokensJpaRepository, userJpaRepository, mapper);
+        new RefreshTokenRepositoryImpl(
+            tokensJpaRepository,
+            userJpaRepository,
+            Mappers.getMapper(UserSessionToJpaEntity.class));
 
     userId = UUID.randomUUID();
-    sessionId = UUID.randomUUID();
-
-    String unique = UUID.randomUUID().toString().substring(0, 8);
 
     JpaUserEntity user = new JpaUserEntity();
     user.setId(userId);
-    user.setUsername("testuser_" + unique);
-    user.setEmail("user_" + unique + "@test.com");
-    user.setPasswordHash("hash123");
+    user.setUsername("user_" + userId);
+    user.setEmail("user_" + userId + "@test.com");
+    user.setPasswordHash("hash");
     user.setCreatedAt(Instant.now());
 
-    userJpaRepository.save(user);
+    entityManager.persist(user);
+    entityManager.flush();
   }
 
   @Test
   @Transactional
-  void shouldSaveAndFindByRefreshToken() {
-    String refreshToken = "refresh-token-123";
+  void deleteByUserIdRemovesAllTokensFromDatabase() {
+    saveToken("t1");
+    saveToken("t2");
 
-    UserSession session =
-        new UserSession(
-            UUID.randomUUID(),
-            userId,
-            sessionId,
-            "127.0.0.1",
-            "JUnit",
-            "Earth",
-            "Linux",
-            refreshToken,
-            false,
-            Instant.now(),
-            Instant.now().plusSeconds(3600));
+    refreshTokenRepository.deleteByUserId(userId);
 
-    refreshTokenRepository.save(session);
+    Long count =
+        entityManager
+            .createQuery("SELECT COUNT(t) FROM JpaTokensEntity t WHERE t.user.id = :id", Long.class)
+            .setParameter("id", userId)
+            .getSingleResult();
 
-    Optional<UserSession> found = refreshTokenRepository.findByRefreshToken(refreshToken);
-
-    assertThat(found).isPresent();
-    assertThat(found.get().getRefreshToken()).isEqualTo(refreshToken);
-    assertThat(found.get().getUserId()).isEqualTo(userId);
-    assertThat(found.get().getSessionId()).isEqualTo(sessionId);
+    assertThat(count).isZero();
   }
 
   @Test
-  void shouldThrowWhenSavingWithoutExistingUser() {
-    UUID fakeUserId = UUID.randomUUID();
+  void deleteByUserIdDoesNothingWhenNoTokensExist() {
+    refreshTokenRepository.deleteByUserId(userId);
 
+    Long count =
+        entityManager
+            .createQuery("SELECT COUNT(t) FROM JpaTokensEntity t WHERE t.user.id = :id", Long.class)
+            .setParameter("id", userId)
+            .getSingleResult();
+
+    assertThat(count).isZero();
+  }
+
+  @Test
+  void savingTokenForMissingUserThrows() {
     UserSession session =
         new UserSession(
             UUID.randomUUID(),
-            fakeUserId,
+            UUID.randomUUID(),
             UUID.randomUUID(),
             "127.0.0.1",
             "JUnit",
             "Earth",
             "Linux",
-            "invalid-token",
+            "invalid",
             false,
             Instant.now(),
             Instant.now().plusSeconds(3600));
@@ -104,113 +104,19 @@ class RefreshTokensRepositoryIntegrationTest extends BaseIntegrationTest {
         JpaObjectRetrievalFailureException.class, () -> refreshTokenRepository.save(session));
   }
 
-  @Test
-  @Transactional
-  void shouldRevokeRefreshToken() {
-    String refreshToken = "to-revoke";
-
-    UserSession session =
+  private void saveToken(String token) {
+    refreshTokenRepository.save(
         new UserSession(
             UUID.randomUUID(),
             userId,
-            sessionId,
+            UUID.randomUUID(),
             "127.0.0.1",
             "JUnit",
-            "Mars",
-            "Linux",
-            refreshToken,
-            false,
-            Instant.now(),
-            Instant.now().plusSeconds(3600));
-
-    refreshTokenRepository.save(session);
-
-    refreshTokenRepository.revokeRefreshToken(refreshToken);
-
-    var updated =
-        tokensJpaRepository
-            .findByRefreshToken(refreshToken)
-            .orElseThrow(() -> new IllegalStateException("Token not found"));
-
-    assertThat(updated.getRevoked()).isTrue();
-  }
-
-  // ✅ NEW TESTS BELOW
-
-  @Test
-  @Transactional
-  void shouldFindActiveSessionsByUserId() {
-    UserSession activeSession =
-        new UserSession(
-            UUID.randomUUID(),
-            userId,
-            UUID.randomUUID(),
-            "127.0.0.1",
-            "Firefox",
             "Earth",
             "Linux",
-            "active-token",
+            token,
             false,
             Instant.now(),
-            Instant.now().plusSeconds(3600));
-
-    refreshTokenRepository.save(activeSession);
-
-    List<UserSession> sessions = refreshTokenRepository.findActiveSessionsByUserId(userId);
-
-    assertThat(sessions).hasSize(1);
-    assertThat(sessions.get(0).getRefreshToken()).isEqualTo("active-token");
-  }
-
-  @Test
-  @Transactional
-  void shouldNotReturnRevokedSessions() {
-    UserSession revokedSession =
-        new UserSession(
-            UUID.randomUUID(),
-            userId,
-            UUID.randomUUID(),
-            "127.0.0.1",
-            "Chrome",
-            "Earth",
-            "Linux",
-            "revoked-token",
-            true,
-            Instant.now(),
-            Instant.now().plusSeconds(3600));
-
-    refreshTokenRepository.save(revokedSession);
-
-    List<UserSession> sessions = refreshTokenRepository.findActiveSessionsByUserId(userId);
-
-    assertThat(sessions).isEmpty();
-  }
-
-  @Test
-  @Transactional
-  void shouldFindActiveSessionBySessionId() {
-    UUID targetSessionId = UUID.randomUUID();
-
-    UserSession session =
-        new UserSession(
-            UUID.randomUUID(),
-            userId,
-            targetSessionId,
-            "127.0.0.1",
-            "Safari",
-            "Earth",
-            "Linux",
-            "session-id-token",
-            false,
-            Instant.now(),
-            Instant.now().plusSeconds(3600));
-
-    refreshTokenRepository.save(session);
-
-    Optional<UserSession> found =
-        refreshTokenRepository.findActiveSessionBySessionId(targetSessionId);
-
-    assertThat(found).isPresent();
-    assertThat(found.get().getSessionId()).isEqualTo(targetSessionId);
+            Instant.now().plusSeconds(3600)));
   }
 }

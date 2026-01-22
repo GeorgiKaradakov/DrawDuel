@@ -67,6 +67,7 @@ const Register = () => {
               formControl={form.control}
               name="username"
               label="Username:"
+              data_cy="register-username-input"
               placeholder="username ..."
               className="w-4/5 text-lg"
             />
@@ -76,6 +77,7 @@ const Register = () => {
               name="email"
               label="Email:"
               type="email"
+              data_cy="register-email-input"
               placeholder="example@email.com"
               className="w-4/5 text-lg"
             />
@@ -87,6 +89,7 @@ const Register = () => {
               type="password"
               putPasVisibilityToggle={true}
               placeholder="password ..."
+              data_cy="register-password-input"
               className="w-4/5 text-md"
               description="The password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol!"
             />
@@ -98,6 +101,7 @@ const Register = () => {
               type="password"
               putPasVisibilityToggle={true}
               placeholder="confirm password:"
+              data_cy="register-confirm-password-input"
               className="w-4/5 text-md"
               description="The confirmed password must be at least 6 characters long and it must contain at least one uppercase letter, one digit and one special symbol and it needs to match your chosen password!"
             />
@@ -108,7 +112,7 @@ const Register = () => {
               label="Agree to Terms and Conditions"
               type="checkbox"
               className="w-4/5"
-              data-cy="agreeTerms"
+              data_cy="register-terms-checkbox"
             />
           </div>
 

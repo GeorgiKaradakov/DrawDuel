@@ -37,14 +37,23 @@
 // }
 
 Cypress.Commands.add("register", (username, email, password) => {
-  cy.request("POST", `${Cypress.env("API_URL")}/api/auth/register`, {
-    username,
-    email,
-    pass: password,
-    repeatPass: password,
-    ipAddress: "127.0.0.1",
-    userAgent: "Cypress",
-    location: "Test",
+  const formData = new FormData();
+  formData.append("username", username);
+  formData.append("email", email);
+  formData.append("pass", password);
+  formData.append("repeatPass", password);
+  formData.append("ipAddress", "127.0.0.1");
+  formData.append("userAgent", "Cypress");
+  formData.append("location", "Test");
+  formData.append("profileImage", undefined);
+
+  cy.request({
+    method: "POST",
+    url: `${Cypress.env("API_URL")}/api/auth/register`,
+    body: formData,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
 });
 
