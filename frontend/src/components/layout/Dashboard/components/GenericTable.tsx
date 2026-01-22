@@ -42,6 +42,7 @@ export function GenericTable<T>({
             <TableRow
               key={rowIndex}
               className="border-b border-neutral-600 hover:bg-neutral-700/60 transition"
+              data-cy="device-row"
             >
               {columns.map((col) => (
                 <TableCell key={String(col.key)} className={col.className}>

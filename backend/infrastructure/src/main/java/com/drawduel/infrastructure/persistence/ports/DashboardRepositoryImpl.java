@@ -41,7 +41,7 @@ public class DashboardRepositoryImpl implements DashboardRepository {
   @Override
   public Optional<LeaderboardEntry> findUserLeaderboard(UUID userId) {
     return findTopLeaderboard(Integer.MAX_VALUE).stream()
-        .filter(e -> e.getUserName().equals(userId.toString())) // adapt if needed
+        .filter(e -> e.getUserId().equals(userId)) // adapt if needed
         .findFirst();
   }
 

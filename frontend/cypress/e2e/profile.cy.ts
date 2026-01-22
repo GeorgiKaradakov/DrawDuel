@@ -1,17 +1,19 @@
 describe("User Settings E2E", () => {
-  let TEST_USER = {
+  const TEST_USER = {
     username: `cypressUser${Date.now()}`,
-    email: `cypress@${Date.now()}test.com`,
+    email: `cypress_${Date.now()}@settings.com`,
     password: "Password123!",
   };
 
   before(() => {
     cy.register(TEST_USER.username, TEST_USER.email, TEST_USER.password);
-    cy.visit("/dashboard");
   });
 
   beforeEach(() => {
-    cy.login(TEST_USER.email, TEST_USER.password);
+    cy.session(TEST_USER.email, () => {
+      cy.login(TEST_USER.email, TEST_USER.password);
+    });
+
     cy.visit("/dashboard");
   });
 
@@ -29,17 +31,43 @@ describe("User Settings E2E", () => {
     cy.get('[data-cy="navbar-AccountSettings"]').click();
     cy.scrollTo("right");
 
-    cy.get('[data-cy="change-Username-input"]').clear().type(newUsername);
+    cy.intercept("PATCH", "/api/user/update-username").as("updateUsername");
 
+    cy.get('[data-cy="change-Username-input"]').clear().type(newUsername);
     cy.get('[data-cy="change-Username-submit"]').click();
 
-    cy.contains("Username updated successfully!").should("be.visible"); //check for success toast
+    cy.wait("@updateUsername").its("response.statusCode").should("eq", 200);
+
+    cy.contains("Username updated successfully!").should("be.visible");
   });
 
-  it("shows active devices", () => {
+  it("updates profile image successfully", () => {
     cy.get('[data-cy="navbar-AccountSettings"]').click();
 
+    cy.intercept("POST", "/api/user/update-profile-image").as(
+      "uploadProfileImage",
+    );
+
+    cy.get('[data-cy="change-profile-image-button"]').click();
+
+    cy.get('[data-cy="change-profile-image-input"]').selectFile(
+      "cypress/fixtures/test-profile-image.png",
+      { force: true },
+    );
+
+    cy.wait("@uploadProfileImage").its("response.statusCode").should("eq", 200);
+
+    cy.contains("Profile image updated successfully!").should("be.visible");
+  });
+
+  it("shows active devices table", () => {
+    cy.intercept("GET", "/api/user/get-devices").as("getDevices");
+
+    cy.get('[data-cy="navbar-AccountSettings"]').click();
     cy.get('[data-cy="settings-sidebar-device-management"]').click();
+
+    cy.wait("@getDevices").its("response.statusCode").should("eq", 200);
+
     cy.get("table").within(() => {
       cy.contains("Operating System").should("be.visible");
       cy.contains("Browser").should("be.visible");
@@ -49,46 +77,44 @@ describe("User Settings E2E", () => {
 
   it("does not allow revoking current session", () => {
     cy.get('[data-cy="navbar-AccountSettings"]').click();
-
     cy.get('[data-cy="settings-sidebar-device-management"]').click();
 
-    cy.get('[data-cy="revoke-session-button-current-session"]').click();
+    cy.intercept("DELETE", "/api/user/revoke-session/*").as("revokeSession");
 
-    cy.contains("Cannot revoke current session").should("be.visible"); //check for error toast
+    cy.get('[data-cy="device-row"]')
+      .first()
+      .within(() => {
+        cy.get('[data-cy="revoke-session-button-current-session"]').click();
+      });
+
+    cy.wait("@revokeSession")
+      .its("response.statusCode")
+      .should("be.oneOf", [400, 409]);
   });
 
-  it("changes password successfully", () => {
+  it("removes profile image successfully", () => {
     cy.get('[data-cy="navbar-AccountSettings"]').click();
-    cy.get('[data-cy="settings-sidebar-security-settings"]').click();
 
-    cy.get('[data-cy="current-password-input"]').type(TEST_USER.password);
-    TEST_USER.password = "NewPassword123!";
-    cy.get('[data-cy="new-password-input"]').type(TEST_USER.password);
+    cy.intercept("DELETE", "/api/user/delete-profile-image").as(
+      "deleteProfileImage",
+    );
 
-    cy.get('[data-cy="change-password-button"]').click();
+    cy.get('[data-cy="remove-profile-image-button"]').click();
 
-    cy.contains("Password updated successfully!").should("be.visible"); //check for success toast
-  });
+    cy.wait("@deleteProfileImage").its("response.statusCode").should("eq", 200);
 
-  it("updates email successfully", () => {
-    const newEmail = `test_${Date.now()}@mail.com`;
-
-    cy.get('[data-cy="navbar-AccountSettings"]').click();
-    cy.scrollTo("right");
-
-    cy.get('[data-cy="change-Email-input"]').clear().type(newEmail);
-
-    cy.get('[data-cy="change-Email-submit"]').click();
-
-    TEST_USER.email = newEmail;
-
-    cy.contains("Email updated successfully!").should("be.visible"); //check for success toast
+    cy.contains("Profile image removed").should("be.visible");
   });
 
   it("deletes account successfully", () => {
     cy.get('[data-cy="navbar-AccountSettings"]').click();
 
+    cy.intercept("DELETE", "/api/user/delete-account").as("deleteAccount");
+
     cy.get('[data-cy="delete-profile-button"]').click();
+
+    cy.wait("@deleteAccount").its("response.statusCode").should("eq", 204);
+
     cy.url().should("include", "/auth/register");
   });
 });

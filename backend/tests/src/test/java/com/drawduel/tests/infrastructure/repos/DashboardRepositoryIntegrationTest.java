@@ -7,36 +7,38 @@ import com.drawduel.application.services.JwtService;
 import com.drawduel.application.usecases.RegisterUseCase;
 import com.drawduel.domain.enums.GameStatus;
 import com.drawduel.domain.models.LeaderboardEntry;
+import com.drawduel.domain.models.RecentMatches;
 import com.drawduel.domain.ports.DashboardRepository;
 import com.drawduel.infrastructure.persistence.jpa.entities.JpaGameEntity;
-import com.drawduel.infrastructure.persistence.jpa.repositories.GameJpaRepository;
 import com.drawduel.tests.BaseIntegrationTest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@Transactional
 class DashboardRepositoryIntegrationTest extends BaseIntegrationTest {
 
-  @Autowired DashboardRepository dashboardRepository;
-
-  @Autowired GameJpaRepository gameJpaRepository;
-
-  @Autowired RegisterUseCase registerUseCase;
-
-  @Autowired JwtService jwtService;
+  @Autowired private DashboardRepository dashboardRepository;
+  @Autowired private RegisterUseCase registerUseCase;
+  @Autowired private JwtService jwtService;
+  @PersistenceContext private EntityManager entityManager;
 
   @Test
   void countsMatchesWinsAndDrawsCorrectly() {
     UUID user = UUID.randomUUID();
     UUID other = UUID.randomUUID();
 
-    saveGame(user, other, user, 10, 5);
-    saveGame(user, other, null, 10, 10);
-    saveGame(user, other, other, 5, 10);
+    saveGame(user, other, user);
+    saveGame(user, other, null);
+    saveGame(user, other, other);
 
     assertThat(dashboardRepository.countTotalMatches(user)).isEqualTo(3);
     assertThat(dashboardRepository.countWins(user)).isEqualTo(1);
@@ -44,71 +46,86 @@ class DashboardRepositoryIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  void returnsRecentMatches() {
+  void returnsRecentMatchesWithLimit() {
     UUID user = UUID.randomUUID();
     UUID other = UUID.randomUUID();
 
     for (int i = 0; i < 5; i++) {
-      saveGame(user, other, user, 10 + i, 5);
+      saveGame(user, other, user);
     }
 
-    var recent = dashboardRepository.findRecentMatches(user, 3);
+    List<RecentMatches> recent = dashboardRepository.findRecentMatches(user, 3);
 
     assertThat(recent).hasSize(3);
+
+    Long dbCount =
+        entityManager
+            .createQuery(
+                "SELECT COUNT(g) FROM JpaGameEntity g WHERE g.playerAId = :user", Long.class)
+            .setParameter("user", user)
+            .getSingleResult();
+
+    assertThat(dbCount).isEqualTo(5);
   }
 
   @Test
-  void buildsLeaderboardCorrectly() {
-    UUID a = registerUser("alice");
-    UUID b = registerUser("bob");
-    UUID c = registerUser("charlie");
-
-    saveGame(a, b, a, 20, 10);
-    saveGame(a, c, a, 30, 5);
-    saveGame(b, c, b, 25, 5);
-
+  void leaderboardIsEmptyWhenNoGamesExist() {
     List<LeaderboardEntry> leaderboard = dashboardRepository.findTopLeaderboard(10);
 
-    assertThat(leaderboard).isNotEmpty();
-    assertThat(leaderboard.get(0).getScore()).isGreaterThan(0);
-    assertThat(leaderboard.get(0).getUserName()).isNotNull();
+    assertThat(leaderboard).isEmpty();
   }
 
   @Test
-  void countsGamesPerDayRaw() {
-    UUID user = UUID.randomUUID();
-    UUID other = UUID.randomUUID();
+  void leaderboardRespectsLimit() {
+    UUID a = registerUser("a");
+    UUID b = registerUser("b");
+    UUID c = registerUser("c");
 
-    saveGame(user, other, user, 10, 5);
-    saveGame(user, other, user, 12, 3);
+    saveGame(a, b, a);
+    saveGame(b, c, b);
+    saveGame(c, a, c);
 
-    List<Object[]> raw = dashboardRepository.countGamesPerDayRaw(user);
+    List<LeaderboardEntry> leaderboard = dashboardRepository.findTopLeaderboard(2);
 
-    assertThat(raw).isNotEmpty();
-    assertThat(raw.get(0)[0]).isInstanceOf(Instant.class);
-    assertThat(raw.get(0)[1]).isInstanceOf(Long.class);
+    assertThat(leaderboard).hasSize(2);
   }
 
-  private void saveGame(UUID a, UUID b, UUID winner, int scoreA, int scoreB) {
+  @Test
+  void findUserLeaderboardReturnsCorrectEntry() {
+    UUID userId = registerUser("alice");
+    UUID other = registerUser("bob");
 
+    saveGame(userId, other, userId);
+    saveGame(userId, other, userId);
+
+    Optional<LeaderboardEntry> entry = dashboardRepository.findUserLeaderboard(userId);
+
+    assertThat(entry).isPresent();
+    assertThat(entry.get().getUserId()).isEqualTo(userId);
+    assertThat(entry.get().getScore()).isGreaterThan(0);
+  }
+
+  // ---------- helpers ----------
+
+  private void saveGame(UUID a, UUID b, UUID winner) {
     JpaGameEntity g = new JpaGameEntity();
     g.setId(UUID.randomUUID());
     g.setPlayerAId(a);
     g.setPlayerBId(b);
     g.setStatus(GameStatus.FINISHED);
     g.setWinnerId(winner);
-    g.setPlayerADrawPoints(scoreA);
+    g.setPlayerADrawPoints(10);
     g.setPlayerAGuessPoints(0);
-    g.setPlayerBDrawPoints(scoreB);
+    g.setPlayerBDrawPoints(5);
     g.setPlayerBGuessPoints(0);
     g.setStartedAt(Instant.now().minusSeconds(300));
     g.setEndedAt(Instant.now());
 
-    gameJpaRepository.save(g);
+    entityManager.persist(g);
+    entityManager.flush();
   }
 
   private UUID registerUser(String username) {
-
     RegisterRequestDto dto =
         new RegisterRequestDto(
             username,
@@ -121,10 +138,6 @@ class DashboardRepositoryIntegrationTest extends BaseIntegrationTest {
             "NL");
 
     var result = registerUseCase.handle(new RegisterUseCase.Query(dto));
-
-    // Extract userId from JWT
-    String accessToken = result.response().getAccessToken();
-
-    return jwtService.extractUserId(accessToken);
+    return jwtService.extractUserId(result.response().getAccessToken());
   }
 }

@@ -126,6 +126,7 @@ const UserProperty = ({
               type="file"
               hidden
               accept="image/*"
+              data-cy="change-profile-image-input"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleImageChange(file);
@@ -137,6 +138,7 @@ const UserProperty = ({
               onClick={handleImageRemove}
               disabled={loading}
               className="min-w-[140px]"
+              data-cy="remove-profile-image-button"
             >
               {loading ? <Spinner /> : "Remove Image"}
             </Button>
@@ -145,6 +147,7 @@ const UserProperty = ({
               onClick={() => fileInputRef.current?.click()}
               disabled={loading}
               className="bg-indigo-500 hover:bg-indigo-400 min-w-[140px]"
+              data-cy="change-profile-image-button"
             >
               {loading ? <Spinner /> : "Change Image"}
             </Button>
